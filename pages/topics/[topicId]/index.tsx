@@ -1,15 +1,15 @@
 import React from "react";
 import { Container, Grid } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import PostCard from "components/PostCard";
-import FloatingActions from "components/FloatingActions";
-import Layout from "components/Layout";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
+import PostCard from "components/PostCard";
+import FloatingActions from "components/FloatingActions";
+import Layout from "components/Layout";
 import { GetTopicPosts, GetTopicPostsVariables } from "apis/types";
 import { GET_TOPIC_POSTS } from "apis/topic_post";
-import { GetStaticProps, GetStaticPaths, GetServerSideProps } from "next";
 import { initializeApollo } from "apis/client";
 
 const useStyles = makeStyles((theme) =>
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const TopicPostPage: React.FC = (props) => {
+const TopicPostPage = () => {
   const classes = useStyles();
 
   const router = useRouter();
@@ -45,7 +45,10 @@ const TopicPostPage: React.FC = (props) => {
       >
         {data?.topic?.[0].posts.map((post) => (
           <Grid item key={post.id}>
-            <Link href={`/topics/${topicId}/posts/${post.id}`}>
+            <Link
+              href="/topics/[topicId]/posts/[postId]"
+              as={`/topics/${topicId}/posts/${post.id}`}
+            >
               <a>
                 <PostCard {...post} />
               </a>
@@ -68,8 +71,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     });
   } catch (e) {
     const { res } = ctx;
-    res.setHeader("location", "/login");
-    res.statusCode = 303;
+    res.writeHead(303, "Unauthorized", {
+      Location: "/login",
+    });
     res.end();
   }
 

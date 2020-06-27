@@ -2,8 +2,18 @@ import React, { useState } from "react";
 import { IconButton, Popover, Chip, Grid, Icon } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { InsertEmoticon } from "@material-ui/icons";
+import { emoji_reaction_enum } from "apis/types";
 
-const emojis = ["👍", "👎", "😄", "🎉", "😕", "❤️", "🚀", "👀"];
+const emojis = {
+  thumbs_up: "👍",
+  thumbs_down: "👎",
+  grinning_face_with_smiling_eyes: "😄",
+  party_popper: "🎉",
+  confused_face: "😕",
+  red_heart: "❤️",
+  rocket: "🚀",
+  eyes: "👀",
+};
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -21,7 +31,14 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const EmojiSelector: React.FC = () => {
+export interface EmojiSelectorProps {
+  value?: {
+    [_ in keyof typeof emojis]: number;
+  };
+  onReact?: (emojiName: emoji_reaction_enum) => void;
+}
+
+const EmojiSelector: React.FC<EmojiSelectorProps> = ({ value, onReact }) => {
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
@@ -43,22 +60,20 @@ const EmojiSelector: React.FC = () => {
         wrap="wrap"
         spacing={1}
       >
-        <Grid item>
-          <Chip
-            classes={{ label: classes.chip }}
-            variant="outlined"
-            clickable
-            label="👍 233"
-          />
-        </Grid>
-        <Grid item>
-          <Chip
-            classes={{ label: classes.chip }}
-            variant="outlined"
-            clickable
-            label="😄 3"
-          />
-        </Grid>
+        {value &&
+          (Object.entries(emojis) as [emoji_reaction_enum, string][]).map(
+            ([name, emoji]) =>
+              value[name] ? (
+                <Grid item key={name}>
+                  <Chip
+                    classes={{ label: classes.chip }}
+                    variant="outlined"
+                    onClick={() => onReact?.(name)}
+                    label={`${emoji} ${value[name]}`}
+                  />
+                </Grid>
+              ) : null
+          )}
         <Grid item>
           <IconButton onClick={handleClick}>
             <InsertEmoticon />
@@ -78,11 +93,12 @@ const EmojiSelector: React.FC = () => {
           horizontal: "left",
         }}
       >
-        {emojis.map((emoji) => (
+        {Object.entries(emojis).map(([name, emoji]) => (
           <IconButton
             key={emoji}
             className={classes.emoji}
             classes={{ label: classes.icon }}
+            onClick={() => onReact?.(name as emoji_reaction_enum)}
           >
             {emoji}
           </IconButton>

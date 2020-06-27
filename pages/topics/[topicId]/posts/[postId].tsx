@@ -7,16 +7,20 @@ import {
   Grid,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
+import { useQuery, useMutation } from "@apollo/client";
+import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import Post from "components/Post";
+import Comment from "components/Comment";
 import Layout from "components/Layout";
 import FloatingActions from "components/FloatingActions";
 import CommentCard from "components/CommentCard";
-import { useQuery } from "@apollo/client";
-import { GetPost, GetPostVariables } from "apis/types";
-import { GET_POST } from "apis/post";
-import { useRouter } from "next/router";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetPost, GetPostVariables, emoji_reaction_enum } from "apis/types";
 import { initializeApollo } from "apis/client";
+import { GET_POST } from "apis/post";
+import { ADD_REACTION } from "apis/reaction";
+import { AddReaction, AddReactionVariables } from "apis/types";
+import useUserId from "lib/useUserId";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -28,19 +32,36 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const PostPage: React.FC = (props) => {
+const PostPage: React.FC = () => {
   const classes = useStyles();
 
   const router = useRouter();
   const { postId } = router.query;
 
-  const { data } = useQuery<GetPost, GetPostVariables>(GET_POST, {
+  const userId = useUserId();
+
+  const { data, refetch } = useQuery<GetPost, GetPostVariables>(GET_POST, {
     variables: {
       id: parseInt(postId as string, 10),
     },
   });
-
   const post = data?.post?.[0];
+
+  const [addReaction] = useMutation<AddReaction, AddReactionVariables>(
+    ADD_REACTION
+  );
+
+  const handleReact = async (id: number, reaction: emoji_reaction_enum) => {
+    await addReaction({
+      variables: {
+        post_id: id,
+        user_id: userId,
+        reaction,
+      },
+    });
+
+    refetch();
+  };
 
   const [commentModalVisible, setCommentModalVisible] = useState(false);
 
@@ -49,7 +70,7 @@ const PostPage: React.FC = (props) => {
   };
 
   return (
-    <Layout page="post" title={post?.topic.name}>
+    <Layout page="post" title={`#${post?.topic.name}`}>
       <Grid
         className={classes.root}
         container
@@ -58,16 +79,14 @@ const PostPage: React.FC = (props) => {
         maxWidth="md"
         spacing={2}
       >
-        <Grid item>{post && <Post {...post} />} </Grid>
-        {/* <Grid item>
-          <Post onCommentButtonClick={() => setCommentModalVisible(true)} />
-        </Grid>
         <Grid item>
-          <Post />
+          <Post {...post!} onReact={handleReact} />
         </Grid>
-        <Grid item>
-          <Post />
-        </Grid> */}
+        {post?.comments?.map((comment) => (
+          <Grid item key={comment.id}>
+            <Comment {...comment} />
+          </Grid>
+        ))}
       </Grid>
       <Dialog
         open={commentModalVisible}
@@ -88,23 +107,26 @@ const PostPage: React.FC = (props) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return { paths: [], fallback: true };
-};
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const apolloClient = initializeApollo(null, ctx);
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const apolloClient = initializeApollo();
-
-  await apolloClient.query<GetPost, GetPostVariables>({
-    query: GET_POST,
-    variables: { id: parseInt(params!.postId as string, 10) },
-  });
+  try {
+    await apolloClient.query<GetPost, GetPostVariables>({
+      query: GET_POST,
+      variables: { id: parseInt(ctx.params!.postId as string, 10) },
+    });
+  } catch (e) {
+    const { res } = ctx;
+    res.writeHead(303, "Unauthorized", {
+      Location: "/login",
+    });
+    res.end();
+  }
 
   return {
     props: {
       initialApolloState: apolloClient.cache.extract(),
     },
-    unstable_revalidate: 1,
   };
 };
 

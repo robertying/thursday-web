@@ -7,6 +7,12 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import theme from "styles/theme";
 import { useApollo } from "apis/client";
 import { ApolloProvider } from "@apollo/client";
+import dayjs from "dayjs";
+import "dayjs/locale/zh-cn";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.locale("zh-cn");
+dayjs.extend(relativeTime);
 
 export default function App({ Component, pageProps }: AppProps) {
   const apolloClient = useApollo(pageProps.initialApolloState);

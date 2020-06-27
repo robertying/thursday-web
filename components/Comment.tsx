@@ -7,14 +7,15 @@ import {
   CardHeader,
   Avatar,
   IconButton,
+  Button,
   Grid,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { Share, Favorite } from "@material-ui/icons";
+import { Share, Favorite, Comment as CommentIcon } from "@material-ui/icons";
 import dayjs from "dayjs";
 import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
-import { GetPost_post, emoji_reaction_enum } from "apis/types";
+import { GetPost_post_comments } from "apis/types";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -32,18 +33,16 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-export interface PostProps {
-  onReact?: (postId: number, reaction: emoji_reaction_enum) => void;
+export interface CommentProps {
+  onCommentButtonClick?: () => void;
 }
 
-const Post: React.FC<GetPost_post & PostProps> = ({
-  id,
-  title,
+const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
   content,
   author,
   updated_at,
-  reaction,
-  onReact,
+  replies_aggregate,
+  onCommentButtonClick,
 }) => {
   const classes = useStyles();
 
@@ -57,9 +56,6 @@ const Post: React.FC<GetPost_post & PostProps> = ({
         subheader={author.status ?? ""}
       />
       <CardContent className={classes.content}>
-        <Typography gutterBottom variant="h6">
-          {title}
-        </Typography>
         <MyEditor defaultValue={JSON.parse(content)} readonly />
         <Typography className={classes.date} variant="caption">
           编辑于 {dayjs(updated_at).fromNow()}
@@ -70,21 +66,49 @@ const Post: React.FC<GetPost_post & PostProps> = ({
           className={classes.actions}
           container
           direction="row"
+          justify="space-between"
           alignItems="center"
         >
-          <Grid item xs>
-            <EmojiSelector
-              value={reaction ?? undefined}
-              onReact={(emojiName) => onReact?.(id, emojiName)}
-            />
+          <Grid
+            container
+            item
+            justify="flex-start"
+            alignItems="center"
+            spacing={1}
+            xs
+          >
+            {onCommentButtonClick && (
+              <Grid item>
+                <Button
+                  startIcon={<CommentIcon color="action" />}
+                  onClick={onCommentButtonClick}
+                >
+                  {replies_aggregate.aggregate?.count}
+                </Button>
+              </Grid>
+            )}
+            <Grid item>
+              <EmojiSelector />
+            </Grid>
           </Grid>
-          <Grid item style={{ visibility: hover ? "visible" : "hidden" }}>
-            <IconButton>
-              <Favorite />
-            </IconButton>
-            <IconButton>
-              <Share />
-            </IconButton>
+          <Grid
+            container
+            item
+            justify="flex-end"
+            alignItems="center"
+            xs
+            style={{ visibility: hover ? "visible" : "hidden" }}
+          >
+            <Grid item>
+              <IconButton>
+                <Favorite />
+              </IconButton>
+            </Grid>
+            <Grid item>
+              <IconButton>
+                <Share />
+              </IconButton>
+            </Grid>
           </Grid>
         </Grid>
       </CardActions>
@@ -92,4 +116,4 @@ const Post: React.FC<GetPost_post & PostProps> = ({
   );
 };
 
-export default Post;
+export default Comment;

@@ -5,7 +5,7 @@ import NavigationBar, { Page } from "./NavigationBar";
 const useStyles = makeStyles((theme) =>
   createStyles({
     main: {
-      margin: "auto",
+      margin: `${theme.spacing(4)}px auto`,
     },
     toolbar: theme.mixins.toolbar,
   })

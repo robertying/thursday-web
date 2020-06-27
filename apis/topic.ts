@@ -5,8 +5,22 @@ export const GET_TOPICS = gql`
     topic(order_by: { priority: desc }) {
       id
       name
-      posts(order_by: { created_at: desc }, limit: 2) {
+      posts(order_by: { created_at: desc }, limit: 3) {
+        id
         title
+        author {
+          username
+          avatar_url
+        }
+        comments(
+          distinct_on: author_id
+          order_by: { author_id: asc, updated_at: desc }
+        ) {
+          author {
+            username
+            avatar_url
+          }
+        }
       }
     }
   }

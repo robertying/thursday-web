@@ -42,6 +42,7 @@ const TopicCard: React.FC<GetTopics_topic> = ({ name, posts }) => {
           <Grid container>
             {posts.map((post) => (
               <Grid
+                key={post.id}
                 container
                 item
                 direction="row"
@@ -59,25 +60,15 @@ const TopicCard: React.FC<GetTopics_topic> = ({ name, posts }) => {
                     max={3}
                   >
                     <Avatar
-                      alt="Remy Sharp"
-                      src="/static/images/avatar/1.jpg"
+                      alt={post.author.username}
+                      src={post.author.avatar_url ?? undefined}
                     />
-                    <Avatar
-                      alt="Travis Howard"
-                      src="/static/images/avatar/2.jpg"
-                    />
-                    <Avatar
-                      alt="Cindy Baker"
-                      src="/static/images/avatar/3.jpg"
-                    />
-                    <Avatar
-                      alt="Agnes Walker"
-                      src="/static/images/avatar/4.jpg"
-                    />
-                    <Avatar
-                      alt="Trevor Henderson"
-                      src="/static/images/avatar/5.jpg"
-                    />
+                    {post.comments.map((comment) => {
+                      <Avatar
+                        alt={comment.author.username}
+                        src={comment.author.avatar_url ?? undefined}
+                      />;
+                    })}
                   </AvatarGroup>
                 </Grid>
               </Grid>

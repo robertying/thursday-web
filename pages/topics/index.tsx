@@ -1,16 +1,21 @@
-import { Grid, Container, Typography } from "@material-ui/core";
+import {
+  Grid,
+  Container,
+  Typography,
+  LinearProgress,
+  Snackbar,
+} from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import TopicCard from "components/TopicCard";
-import Layout from "components/Layout";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
+import TopicCard from "components/TopicCard";
+import Layout from "components/Layout";
 import { GetTopics } from "apis/types";
 import { GET_TOPICS } from "apis/topic";
-import { GetServerSideProps } from "next";
 import { initializeApollo } from "apis/client";
-import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import useUserSession from "lib/useUserSession";
-import { useEffect } from "react";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -28,46 +33,57 @@ const useStyles = makeStyles((theme) =>
 const TopicPage = () => {
   const classes = useStyles();
 
-  const router = useRouter();
+  useUserSession();
 
-  const { loading, error, data } = useQuery<GetTopics>(GET_TOPICS);
+  const { loading, error, data } = useQuery<GetTopics>(GET_TOPICS, {
+    pollInterval: 1 * 60 * 1000,
+  });
+
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (error) {
+      setMessage("刷新失败");
+    } else {
+      setMessage("");
+    }
+  }, [error]);
 
   return (
-    <Layout page="topics">
-      <Grid
-        className={classes.root}
-        container
-        component={Container}
-        direction="column"
-        maxWidth="md"
-      >
-        <Typography variant="h5" gutterBottom className={classes.subtitle}>
-          综合讨论
-        </Typography>
-        <Grid container direction="column" alignItems="center" spacing={2}>
-          <Grid container item justify="flex-start" spacing={2}>
-            {data?.topic.map((topic) => (
-              <Grid key={topic.id} item xs={6}>
-                <Link href={`/topics/${topic.id}`}>
-                  <a>
-                    <TopicCard {...topic} />
-                  </a>
-                </Link>
-              </Grid>
-            ))}
+    <>
+      {loading && <LinearProgress />}
+      <Layout page="topics">
+        <Grid
+          className={classes.root}
+          container
+          component={Container}
+          direction="column"
+          maxWidth="md"
+        >
+          <Typography variant="h5" gutterBottom className={classes.subtitle}>
+            综合讨论
+          </Typography>
+          <Grid container direction="column" alignItems="center" spacing={2}>
+            <Grid container item justify="flex-start" spacing={2}>
+              {data?.topic.map((topic) => (
+                <Grid key={topic.id} item xs={6}>
+                  <Link href="/topics/[topicId]" as={`/topics/${topic.id}`}>
+                    <a>
+                      <TopicCard {...topic} />
+                    </a>
+                  </Link>
+                </Grid>
+              ))}
+            </Grid>
           </Grid>
         </Grid>
-        <Typography variant="h5" gutterBottom className={classes.subtitle}>
-          站务管理
-        </Typography>
-        <Grid container direction="column" alignItems="center" spacing={2}>
-          <Grid container item justify="center" spacing={2}>
-            <Grid item xs></Grid>
-            <Grid item xs></Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Layout>
+        <Snackbar
+          open={message ? true : false}
+          onClose={() => setMessage("")}
+          message={<span>{message}</span>}
+        />
+      </Layout>
+    </>
   );
 };
 
@@ -80,8 +96,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     });
   } catch (e) {
     const { res } = ctx;
-    res.setHeader("location", "/login");
-    res.statusCode = 303;
+    res.writeHead(303, "Unauthorized", {
+      Location: "/login",
+    });
     res.end();
   }
 

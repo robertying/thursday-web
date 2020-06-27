@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) =>
     appBar: {
       backgroundColor: theme.palette.background.default,
       color: "black",
+      top: "unset",
     },
   })
 );

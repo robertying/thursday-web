@@ -71,11 +71,11 @@ const LoginPage: React.FC = () => {
 
   const { session } = useUserSession();
 
-  useEffect(() => {
-    if (session) {
-      router.push("/");
-    }
-  }, [session]);
+  // useEffect(() => {
+  //   if (session) {
+  //     router.push("/");
+  //   }
+  // }, [session]);
 
   const [values, setValues] = React.useState<FormState>({
     username: "",

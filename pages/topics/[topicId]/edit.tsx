@@ -31,6 +31,7 @@ import { initializeApollo } from "apis/client";
 import { getUserAttributes } from "apis/cognito";
 import { GET_TOPIC_BY_ID } from "apis/topic";
 import { route } from "next/dist/next-server/server/router";
+import useUserId from "lib/useUserId";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -76,16 +77,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
     }
   }, []);
 
-  const { user } = useUserSession();
-  const [authorId, setAuthorId] = useState<string | undefined>(undefined);
-  useEffect(() => {
-    (async () => {
-      if (user) {
-        const result = await getUserAttributes(user);
-        setAuthorId(result.find((v) => v.getName() === "sub")?.getValue());
-      }
-    })();
-  }, [user]);
+  const authorId = useUserId();
 
   const handleClose = () => {
     router.back();

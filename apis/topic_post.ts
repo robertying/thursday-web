@@ -5,14 +5,25 @@ export const GET_TOPIC_POSTS = gql`
     topic(where: { id: { _eq: $id } }) {
       id
       name
-      posts(
-        distinct_on: topic_id
-        order_by: { topic_id: asc, revision: desc, updated_at: desc }
-      ) {
+      posts(order_by: { updated_at: desc }) {
         id
-        revision
         title
+        content
         updated_at
+        author {
+          username
+          avatar_url
+        }
+        comments(
+          distinct_on: author_id
+          order_by: { author_id: asc, updated_at: desc }
+        ) {
+          id
+          author {
+            username
+            avatar_url
+          }
+        }
       }
     }
   }

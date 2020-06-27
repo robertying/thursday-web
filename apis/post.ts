@@ -2,22 +2,53 @@ import { gql } from "@apollo/client";
 
 export const GET_POST = gql`
   query GetPost($id: Int!) {
-    post(
-      where: { id: { _eq: $id } }
-      distinct_on: topic_id
-      order_by: { topic_id: asc, revision: desc }
-    ) {
+    post(where: { id: { _eq: $id } }) {
       id
-      revision
-      title
-      content
-      author {
-        id
-        username
-        avatar_url
-      }
       topic {
         name
+      }
+      title
+      content
+      reaction {
+        confused_face
+        eyes
+        grinning_face_with_smiling_eyes
+        party_popper
+        red_heart
+        rocket
+        thumbs_down
+        thumbs_up
+      }
+      updated_at
+      author {
+        username
+        avatar_url
+        status
+      }
+      comments(order_by: { created_at: asc }) {
+        id
+        content
+        reaction {
+          confused_face
+          eyes
+          grinning_face_with_smiling_eyes
+          party_popper
+          red_heart
+          rocket
+          thumbs_down
+          thumbs_up
+        }
+        updated_at
+        author {
+          username
+          avatar_url
+          status
+        }
+        replies_aggregate {
+          aggregate {
+            count
+          }
+        }
       }
     }
   }
@@ -35,7 +66,6 @@ export const ADD_POST = gql`
         author_id: $author_id
         title: $title
         content: $content
-        revision: 0
         topic_id: $topic_id
       }
     ) {
