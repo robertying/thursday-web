@@ -1,0 +1,21 @@
+diff --git a/node_modules/slate-react/dist/index.es.js b/node_modules/slate-react/dist/index.es.js
+index 719b0c4..157495f 100644
+--- a/node_modules/slate-react/dist/index.es.js
++++ b/node_modules/slate-react/dist/index.es.js
+@@ -1715,7 +1715,15 @@ var Editable = props => {
+             break;
+           }
+ 
+-        case 'insertFromComposition':
++        case 'insertFromComposition': {
++          // COMPAT: in safari, `compositionend` event is dispatched after
++          // the beforeinput event with the inputType "insertisComposing has been dispatched
++          // https://www.w3.org/TR/input-events-2/
++          // so the following code is the right logic
++          // because DOM selection in sync will be exec before `compositionend` event
++          // isComposing = true will prevent DOM selection being update correct
++          state.isComposing = false;
++        }
+         case 'insertFromDrop':
+         case 'insertFromPaste':
+         case 'insertFromYank':
