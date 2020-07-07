@@ -12,10 +12,13 @@ import {
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Close } from "@material-ui/icons";
-import Editor from "components/Editor";
+import { GetServerSideProps } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { Node } from "slate";
+import { useMutation } from "@apollo/client";
+import Editor from "components/Editor";
 import {
   AddPost,
   AddPostVariables,
@@ -23,13 +26,12 @@ import {
   GetTopicByIdVariables,
   GetTopicById_topic_by_pk,
 } from "apis/types";
-import { useMutation } from "@apollo/client";
 import { ADD_POST } from "apis/post";
-import { GetServerSideProps } from "next";
 import { initializeApollo } from "apis/client";
 import { GET_TOPIC_BY_ID } from "apis/topic";
 import useUserId from "lib/useUserId";
-import Link from "next/link";
+import { getNodes, serialize, isEmpty } from "lib/slatejs";
+import { isMobile } from "lib/platform";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -91,6 +93,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
 
   const [title, setTitle] = useState("");
   const [value, setValue] = useState<Node[]>([]);
+  const [plainValue, setPlainValue] = useState("");
 
   const [addPost, { loading, error }] = useMutation<AddPost, AddPostVariables>(
     ADD_POST
@@ -108,9 +111,19 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
       return;
     }
 
-    if (!value) {
-      setMessage("请输入内容");
-      return;
+    let v: string | null = null;
+    if (isMobile()) {
+      if (!plainValue) {
+        setMessage("请输入内容");
+        return;
+      }
+      v = serialize(getNodes(plainValue));
+    } else {
+      if (isEmpty(value)) {
+        setMessage("请输入内容");
+        return;
+      }
+      v = serialize(value);
     }
 
     const post = await addPost({
@@ -118,7 +131,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
         author_id: authorId!,
         topic_id: topic!.id,
         title,
-        content: JSON.stringify(value),
+        content: v,
       },
     });
 
@@ -176,7 +189,11 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
         onChange={(e) => setTitle(e.target.value)}
       />
       <Divider />
-      <Editor className={classes.editor} onChange={setValue} />
+      <Editor
+        className={classes.editor}
+        onChange={setValue}
+        onPlainTextChange={setPlainValue}
+      />
       <Snackbar
         open={message ? true : false}
         autoHideDuration={3000}

@@ -27,6 +27,7 @@ import { withImages, ImageButton, Image } from "./Image";
 import { withLinks, LinkButton, Link } from "./Link";
 import { withNewline } from "./Newline";
 import { withMath, MathButton, Math } from "./Math";
+import { isMobile } from "lib/platform";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -49,6 +50,17 @@ const useStyles = makeStyles((theme) =>
         padding: `${theme.spacing(1)}px ${theme.spacing(3)}px`,
       },
     }),
+    textarea: {
+      resize: "none",
+      border: "none",
+      outline: "none",
+      boxShadow: "none",
+      boxSizing: "initial",
+      backgroundColor: (props: { readonly?: boolean }) =>
+        props.readonly
+          ? theme.palette.background.paper
+          : theme.palette.background.default,
+    },
     toolbar: {
       overflowX: "auto",
       overflowY: "hidden",
@@ -67,6 +79,7 @@ function MyEditor(props: {
   defaultValue?: Node[];
   readonly?: boolean;
   onChange?: (value: Node[]) => void;
+  onPlainTextChange?: (value: string) => void;
   compact?: boolean;
 }) {
   const classes = useStyles({
@@ -95,9 +108,28 @@ function MyEditor(props: {
     ]
   );
 
+  const [plainValue, setPlainValue] = useState("");
+
   const [readOnly, setReadOnly] = useState(false);
 
-  return (
+  const isMobilePlatform = useMemo(() => isMobile(), []);
+
+  return isMobilePlatform && !(props.readonly || readOnly) ? (
+    <textarea
+      className={`MuiInputBase-root ${classes.editable} ${classes.textarea} ${
+        props.className ?? ""
+      }`}
+      autoFocus
+      autoCapitalize="on"
+      autoCorrect="on"
+      spellCheck
+      value={plainValue}
+      onChange={(e) => {
+        setPlainValue(e.target.value);
+        props.onPlainTextChange?.(e.target.value);
+      }}
+    />
+  ) : (
     <div className={`${classes.root} ${props.className ?? ""}`}>
       <Slate
         editor={editor}

@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
 import { GetPost_post, emoji_reaction_enum } from "apis/types";
+import { deserialize } from "lib/slatejs";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -64,7 +65,7 @@ const Post: React.FC<GetPost_post & PostProps> = ({
         <Typography gutterBottom variant="h6">
           {title}
         </Typography>
-        <MyEditor defaultValue={JSON.parse(content)} readonly />
+        <MyEditor defaultValue={deserialize(content)} readonly />
         <Typography className={classes.date} variant="caption">
           编辑于 {dayjs(updated_at).fromNow()}
         </Typography>

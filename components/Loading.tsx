@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { LinearProgress } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { isWeChatBrowser } from "lib/wechat";
+import { isWeChatBrowser } from "lib/platform";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

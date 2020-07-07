@@ -9,10 +9,9 @@ import {
 } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { Node } from "slate";
 import dayjs from "dayjs";
 import { GetTopicPosts_topic_posts } from "apis/types";
-import { getPlainText } from "lib/slatejs";
+import { getPlainText, deserialize } from "lib/slatejs";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -65,7 +64,7 @@ const PostCard: React.FC<GetTopicPosts_topic_posts> = ({
         />
         <CardContent>
           <Typography className={classes.title} variant="body1">
-            {getPlainText(JSON.parse(content) as Node[])}
+            {getPlainText(deserialize(content))}
           </Typography>
           <Grid
             container

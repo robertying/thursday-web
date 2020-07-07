@@ -16,10 +16,12 @@ import {
   ListItemText,
 } from "@material-ui/core";
 import { makeStyles, createStyles, useTheme } from "@material-ui/core/styles";
+import { Link } from "@material-ui/icons";
 import { useQuery, useMutation } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
+import { Node } from "slate";
 import Post from "components/Post";
 import Comment from "components/Comment";
 import Layout from "components/Layout";
@@ -42,11 +44,10 @@ import { GET_POST } from "apis/post";
 import { ADD_REACTION, DELETE_REACTION } from "apis/reaction";
 import { AddReaction, AddReactionVariables } from "apis/types";
 import useUserId from "lib/useUserId";
-import { Node } from "slate";
 import { ADD_COMMENT } from "apis/comment";
-import { serialize } from "lib/slatejs";
+import { serialize, getNodes, isEmpty } from "lib/slatejs";
 import { GET_USER } from "apis/user";
-import { Link } from "@material-ui/icons";
+import { isMobile } from "lib/platform";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -159,6 +160,7 @@ const PostPage: React.FC = () => {
 
   const [commentEditDialogOpen, setCommentEditDialogOpen] = useState(false);
   const [commentValue, setCommentValue] = useState<Node[]>([]);
+  const [commentPlainValue, setCommentPlainValue] = useState("");
 
   const [addComment, { loading, error, data: addCommentData }] = useMutation<
     AddComment,
@@ -192,11 +194,26 @@ const PostPage: React.FC = () => {
   };
 
   const handleCommentEdit = async () => {
+    let v: string | null = null;
+    if (isMobile()) {
+      if (!commentPlainValue) {
+        setMessage("请输入内容");
+        return;
+      }
+      v = serialize(getNodes(commentPlainValue));
+    } else {
+      if (isEmpty(commentValue)) {
+        setMessage("请输入内容");
+        return;
+      }
+      v = serialize(commentValue);
+    }
+
     await addComment({
       variables: {
         author_id: userId!,
         post_id: parseInt(postId as string, 10),
-        content: serialize(commentValue),
+        content: v,
       },
     });
   };
@@ -287,7 +304,11 @@ const PostPage: React.FC = () => {
       >
         <DialogTitle>添加评论</DialogTitle>
         <DialogContent>
-          <Editor compact onChange={setCommentValue} />
+          <Editor
+            compact
+            onChange={setCommentValue}
+            onPlainTextChange={setCommentPlainValue}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCommentEditClose} color="primary">
