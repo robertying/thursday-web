@@ -2,6 +2,7 @@ import "styles/global.css";
 import "katex/dist/katex.min.css";
 import { useEffect } from "react";
 import { AppProps } from "next/app";
+import Head from "next/head";
 import { DefaultSeo } from "next-seo";
 import { CssBaseline } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/core/styles";
@@ -30,20 +31,53 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <ApolloProvider client={apolloClient}>
+      <Head>
+        <meta charSet="utf-8" />
+        <meta
+          name="viewport"
+          content="minimum-scale=1, initial-scale=1, width=device-width"
+        />
+        <meta name="theme-color" content={theme.palette.primary.main} />
+        <meta name="apple-mobile-web-app-title" content="星期四" />
+        <meta name="application-name" content="星期四" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="mask-icon"
+          href="/safari-pinned-tab.svg"
+          color={theme.palette.primary.main}
+        />
+        <link rel="manifest" href="/manifest.json" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <DefaultSeo
-        title="Thursday"
+        title="星期四"
         titleTemplate="星期四｜%s"
         description="星期四社区"
         noindex
         nofollow
         dangerouslySetAllPagesToNoIndex
         dangerouslySetAllPagesToNoFollow
-        additionalMetaTags={[
-          {
-            property: "viewport",
-            content: "minimum-scale=1, initial-scale=1, width=device-width",
-          },
-        ]}
         openGraph={{
           url: "https://thu.community/",
           type: "website",
