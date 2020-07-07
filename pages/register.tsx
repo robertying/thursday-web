@@ -199,7 +199,7 @@ const RegisterPage: React.FC = () => {
         />
         <TextField
           label="密码"
-          helperText="长度至少为 12，需包含大小写字母、数字及特殊符号"
+          helperText="长度至少为 10，需包含大小写字母及数字"
           autoComplete="new-password"
           type={values.showPassword ? "text" : "password"}
           fullWidth

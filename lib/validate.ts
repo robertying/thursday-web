@@ -27,11 +27,9 @@ export const validateUsername = (username: string) => {
 };
 
 /**
- * 12 length minimum password
- * with at least one lowercase, one uppercase, one special character and one number respectively
+ * 10 length minimum password
+ * with at least one lowercase, one uppercase, and one number respectively
  */
 export const validatePassword = (password: string) => {
-  return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{12,}$/.test(
-    password
-  );
+  return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{10,}$/.test(password);
 };
