@@ -173,7 +173,9 @@ const PostPage: React.FC = () => {
         setCommentEditDialogOpen(false);
         await refetch();
         router.push(
-          `${router.asPath}#comment-${addCommentData.insert_comment_one?.id}`
+          `${router.asPath.split("#")[0]}#comment-${
+            addCommentData.insert_comment_one?.id
+          }`
         );
       })();
     }
