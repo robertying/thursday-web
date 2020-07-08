@@ -14,5 +14,6 @@ module.exports = withPlugins(
       process.env.NODE_ENV === "production"
         ? "https://thursday.cdn.robertying.net"
         : "",
+    compress: false,
   }
 );
