@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-const url = `${process.env.NEXT_PUBLIC_API_URL}/v1/graphql`;
+const url = `${process.env.API_URL}/v1/graphql`;
 const GET_POST_AUTHOR = `
     query GetPostAuthor($post_id:Int!) {
         post_by_pk(id: $post_id) {
@@ -95,7 +95,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             comment_id: data.comment_id,
           },
         };
-        let response = await fetch(url, {
+        const response = await fetch(url, {
           method: "POST",
           headers: {
             "content-type": "application/json",

@@ -38,7 +38,7 @@ function createApolloClient(ctx?: GetServerSidePropsContext<ParsedUrlQuery>) {
   if (typeof window === "undefined") {
     const token = getTokenFromCookie(ctx);
     link = new HttpLink({
-      uri: `${process.env.NEXT_PUBLIC_API_URL}/v1/graphql`,
+      uri: `${process.env.API_URL}/v1/graphql`,
       headers: token
         ? {
             Authorization: "Bearer " + token,
