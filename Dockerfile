@@ -1,6 +1,6 @@
 # Builder stage
 
-FROM node:14 AS builder
+FROM node:14
 
 # Create app directory
 WORKDIR /home/node/app
@@ -8,6 +8,9 @@ WORKDIR /home/node/app
 # Install app dependencies
 COPY package.json yarn.lock ./
 RUN yarn install
+
+# Copy source files
+COPY . .
 
 # Build
 RUN yarn build
