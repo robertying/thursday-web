@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "analyze": "ANALYZE=true next build",
+    "lint": "tsc --noUnusedLocals",
     "postinstall": "patch-package"
   },
   "dependencies": {

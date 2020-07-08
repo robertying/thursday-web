@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint
+        run: yarn lint
+      - name: Build
+        run: yarn build
+
+  deploy:
+    needs: [check]
+    runs-on: ubuntu-latest
+    env:
+      USERNAME: $GITHUB_ACTOR
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login into registry
+        run: echo $GITHUB_TOKEN | docker login docker.pkg.github.com -u $USERNAME --password-stdin
+      - name: Build Docker image
+        run: docker build -t docker.pkg.github.com/$GITHUB_REPOSITORY/web:latest .
+      - name: Push to registry
+        run: docker push docker.pkg.github.com/$GITHUB_REPOSITORY/web:latest
