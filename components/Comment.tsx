@@ -16,6 +16,7 @@ import MyEditor from "./Editor";
 import { GetPost_post_comments, emoji_reaction_enum } from "apis/types";
 import { deserialize } from "lib/slatejs";
 import Avatar from "components/Avatar";
+import Link from "next/link";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -23,7 +24,7 @@ const useStyles = makeStyles((theme) =>
       padding: `${theme.spacing(2)}px ${theme.spacing(6)}px`,
       [theme.breakpoints.down("sm")]: {
         padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
-    },
+      },
     },
     date: {
       display: "block",
@@ -67,7 +68,14 @@ const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
     <Card>
       <CardHeader
         avatar={
-          <Avatar src={author.avatar_url ?? undefined} alt={author.username} />
+          <Link href="/users/[userId]" as={`/users/${author.username}`}>
+            <a>
+              <Avatar
+                src={author.avatar_url ?? undefined}
+                alt={author.username}
+              />
+            </a>
+          </Link>
         }
         title={author.username}
         subheader={author.status ?? ""}

@@ -15,6 +15,7 @@ import MyEditor from "./Editor";
 import { GetPost_post, emoji_reaction_enum } from "apis/types";
 import { deserialize } from "lib/slatejs";
 import Avatar from "components/Avatar";
+import Link from "next/link";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -56,7 +57,14 @@ const Post: React.FC<GetPost_post & PostProps> = ({
     <Card>
       <CardHeader
         avatar={
-          <Avatar src={author.avatar_url ?? undefined} alt={author.username} />
+          <Link href="/users/[userId]" as={`/users/${author.username}`}>
+            <a>
+              <Avatar
+                src={author.avatar_url ?? undefined}
+                alt={author.username}
+              />
+            </a>
+          </Link>
         }
         title={author.username}
         subheader={author.status ?? ""}
