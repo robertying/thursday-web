@@ -8,6 +8,7 @@ import {
   Avatar,
   Snackbar,
   LinearProgress,
+  Typography,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
@@ -78,10 +79,15 @@ const LoginPage: React.FC = () => {
 
   const { session } = useUserSession();
 
+  const [redirecting, setRedirecting] = useState(false);
+
   useEffect(() => {
     if (session) {
-      setMessage("已登录，跳转中……");
-      setTimeout(() => router.push("/"), 1000);
+      setRedirecting(true);
+      setTimeout(
+        () => router.push((redirect_url as string | undefined) ?? "/"),
+        1000
+      );
     }
   }, [session]);
 
@@ -171,74 +177,83 @@ const LoginPage: React.FC = () => {
     <div className={classes.root}>
       <NextSeo title="登录" />
       {loading && <LinearProgress className={classes.loading} />}
-      <Paper className={classes.paper} component="form" elevation={8}>
-        <Avatar className={classes.logo} src="/logo.png" alt="logo" />
-        <TextField
-          label="用户名"
-          type="username"
-          autoComplete="username"
-          fullWidth
-          value={values.username}
-          onChange={handleChange("username")}
-        />
-        <TextField
-          label="密码"
-          autoComplete="current-password"
-          type={values.showPassword ? "text" : "password"}
-          fullWidth
-          value={values.password}
-          onChange={handleChange("password")}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                >
-                  {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        {needVerification && (
-          <Link
-            href={{ pathname: "/verify", query: { username: values.username } }}
-          >
-            <a>
-              <Button>验证账号</Button>
-            </a>
-          </Link>
-        )}
-        {needTsinghuaVerification && (
-          <Link
-            href={{
-              pathname: "/verify",
-              query: { username: values.username, type: "tsinghua" },
+      {redirecting ? (
+        <Paper className={classes.paper} component="form" elevation={8}>
+          <Typography variant="h6">已登录，自动跳转中……</Typography>
+        </Paper>
+      ) : (
+        <Paper className={classes.paper} component="form" elevation={8}>
+          <Avatar className={classes.logo} src="/logo.png" alt="logo" />
+          <TextField
+            label="用户名"
+            type="username"
+            autoComplete="username"
+            fullWidth
+            value={values.username}
+            onChange={handleChange("username")}
+          />
+          <TextField
+            label="密码"
+            autoComplete="current-password"
+            type={values.showPassword ? "text" : "password"}
+            fullWidth
+            value={values.password}
+            onChange={handleChange("password")}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
-          >
-            <a>
-              <Button>验证清华身份</Button>
-            </a>
-          </Link>
-        )}
-        <div className={classes.buttons}>
-          <Link href="/register">
-            <a>
-              <Button>注册</Button>
-            </a>
-          </Link>
-          <Button
-            color="primary"
-            variant="contained"
-            disabled={loading}
-            onClick={handleLogin}
-          >
-            登录
-          </Button>
-        </div>
-      </Paper>
+          />
+          {needVerification && (
+            <Link
+              href={{
+                pathname: "/verify",
+                query: { username: values.username },
+              }}
+            >
+              <a>
+                <Button>验证账号</Button>
+              </a>
+            </Link>
+          )}
+          {needTsinghuaVerification && (
+            <Link
+              href={{
+                pathname: "/verify",
+                query: { username: values.username, type: "tsinghua" },
+              }}
+            >
+              <a>
+                <Button>验证清华身份</Button>
+              </a>
+            </Link>
+          )}
+          <div className={classes.buttons}>
+            <Link href="/register">
+              <a>
+                <Button>注册</Button>
+              </a>
+            </Link>
+            <Button
+              color="primary"
+              variant="contained"
+              disabled={loading}
+              onClick={handleLogin}
+            >
+              登录
+            </Button>
+          </div>
+        </Paper>
+      )}
       <Snackbar
         open={message ? true : false}
         autoHideDuration={3000}
