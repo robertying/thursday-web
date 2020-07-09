@@ -3,7 +3,17 @@ import { gql } from "@apollo/client";
 export const GET_ACTIVITIES = gql`
   query GetActivities($user_id: uuid!) {
     activity(
-      where: { user_id: { _eq: $user_id } }
+      where: {
+        _and: [
+          { user_id: { _eq: $user_id } }
+          {
+            _or: [
+              { comment: { author_id: { _neq: $user_id } } }
+              { reply: { author_id: { _neq: $user_id } } }
+            ]
+          }
+        ]
+      }
       order_by: { created_at: desc }
     ) {
       id

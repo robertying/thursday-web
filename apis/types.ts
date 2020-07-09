@@ -809,6 +809,74 @@ export interface GetUserProfileVariables {
 // @generated
 // This file was automatically generated and should not be edited.
 
+// ====================================================
+// GraphQL mutation operation: UpdateUserAvatar
+// ====================================================
+
+export interface UpdateUserAvatar_update_user_returning {
+  __typename: "user";
+  avatar_url: string | null;
+}
+
+export interface UpdateUserAvatar_update_user {
+  __typename: "user_mutation_response";
+  /**
+   * data of the affected rows by the mutation
+   */
+  returning: UpdateUserAvatar_update_user_returning[];
+}
+
+export interface UpdateUserAvatar {
+  /**
+   * update data of the table: "user"
+   */
+  update_user: UpdateUserAvatar_update_user | null;
+}
+
+export interface UpdateUserAvatarVariables {
+  username: string;
+  avatar_url: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: UpdateUserStatus
+// ====================================================
+
+export interface UpdateUserStatus_update_user_returning {
+  __typename: "user";
+  status: string | null;
+}
+
+export interface UpdateUserStatus_update_user {
+  __typename: "user_mutation_response";
+  /**
+   * data of the affected rows by the mutation
+   */
+  returning: UpdateUserStatus_update_user_returning[];
+}
+
+export interface UpdateUserStatus {
+  /**
+   * update data of the table: "user"
+   */
+  update_user: UpdateUserStatus_update_user | null;
+}
+
+export interface UpdateUserStatusVariables {
+  username: string;
+  status: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
 //==============================================================
 // START Enums and Input Objects
 //==============================================================
