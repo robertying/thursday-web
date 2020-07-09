@@ -587,55 +587,65 @@ export interface GetTopicPostsVariables {
 // GraphQL query operation: GetTopics
 // ====================================================
 
-export interface GetTopics_topic_posts_author {
+export interface GetTopics_category_topics_posts_author {
   __typename: "user";
   username: string;
   avatar_url: string | null;
 }
 
-export interface GetTopics_topic_posts_comments_author {
+export interface GetTopics_category_topics_posts_comments_author {
   __typename: "user";
   username: string;
   avatar_url: string | null;
 }
 
-export interface GetTopics_topic_posts_comments {
+export interface GetTopics_category_topics_posts_comments {
   __typename: "comment";
   /**
    * An object relationship
    */
-  author: GetTopics_topic_posts_comments_author;
+  author: GetTopics_category_topics_posts_comments_author;
 }
 
-export interface GetTopics_topic_posts {
+export interface GetTopics_category_topics_posts {
   __typename: "post";
   id: number;
   title: string;
   /**
    * An object relationship
    */
-  author: GetTopics_topic_posts_author;
+  author: GetTopics_category_topics_posts_author;
   /**
    * An array relationship
    */
-  comments: GetTopics_topic_posts_comments[];
+  comments: GetTopics_category_topics_posts_comments[];
 }
 
-export interface GetTopics_topic {
+export interface GetTopics_category_topics {
   __typename: "topic";
   id: number;
   name: string;
   /**
    * An array relationship
    */
-  posts: GetTopics_topic_posts[];
+  posts: GetTopics_category_topics_posts[];
+}
+
+export interface GetTopics_category {
+  __typename: "category";
+  name: string;
+  id: number;
+  /**
+   * An array relationship
+   */
+  topics: GetTopics_category_topics[];
 }
 
 export interface GetTopics {
   /**
-   * fetch data from the table: "topic"
+   * fetch data from the table: "category"
    */
-  topic: GetTopics_topic[];
+  category: GetTopics_category[];
 }
 
 /* tslint:disable */

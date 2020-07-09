@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import {
   Grid,
   Container,
@@ -75,30 +75,48 @@ const TopicPage: React.FC = () => {
         username={userData?.user_by_pk?.username}
         userAvatarUrl={userData?.user_by_pk?.avatar_url}
       >
-        <Grid
-          className={classes.root}
-          container
-          component={Container}
-          direction="column"
-          maxWidth="md"
-        >
-          <Typography variant="h5" gutterBottom className={classes.subtitle}>
-            综合讨论
-          </Typography>
-          <Grid container direction="column" alignItems="center" spacing={2}>
-            <Grid container item justify="flex-start" spacing={2}>
-              {data?.topic.map((topic) => (
-                <Grid key={topic.id} item xs={6}>
-                  <Link href="/topics/[topicId]" as={`/topics/${topic.id}`}>
-                    <a>
-                      <TopicCard {...topic} />
-                    </a>
-                  </Link>
+        {data?.category && (
+          <Grid
+            className={classes.root}
+            container
+            component={Container}
+            direction="column"
+            maxWidth="md"
+          >
+            {data!.category.map((category) => (
+              <Fragment key={category.id}>
+                <Typography
+                  variant="h5"
+                  gutterBottom
+                  className={classes.subtitle}
+                >
+                  {category.name}
+                </Typography>
+                <Grid
+                  container
+                  direction="column"
+                  alignItems="center"
+                  spacing={2}
+                >
+                  <Grid container item justify="flex-start" spacing={2}>
+                    {category.topics.map((topic) => (
+                      <Grid key={topic.id} item xs={6}>
+                        <Link
+                          href="/topics/[topicId]"
+                          as={`/topics/${topic.id}`}
+                        >
+                          <a>
+                            <TopicCard {...topic} />
+                          </a>
+                        </Link>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Grid>
-              ))}
-            </Grid>
+              </Fragment>
+            ))}
           </Grid>
-        </Grid>
+        )}
         <Snackbar
           open={message ? true : false}
           onClose={() => setMessage("")}
