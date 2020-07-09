@@ -21,6 +21,9 @@ const useStyles = makeStyles((theme) =>
   createStyles({
     content: {
       padding: `${theme.spacing(2)}px ${theme.spacing(6)}px`,
+      [theme.breakpoints.down("sm")]: {
+        padding: `${theme.spacing(1)}px ${theme.spacing(2)}px`,
+    },
     },
     date: {
       display: "block",
