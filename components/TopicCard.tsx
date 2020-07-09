@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { GetTopics_topic } from "apis/types";
+import { GetTopics_category_topics } from "apis/types";
 import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const TopicCard: React.FC<GetTopics_topic> = ({ name, posts }) => {
+const TopicCard: React.FC<GetTopics_category_topics> = ({ name, posts }) => {
   const classes = useStyles();
 
   return (
