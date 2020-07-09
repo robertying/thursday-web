@@ -12,6 +12,7 @@ export const GET_USER = gql`
 export const GET_USER_PROFILE = gql`
   query GetUserProfile($username: String!) {
     user(where: { username: { _eq: $username } }) {
+      id
       username
       avatar_url
       status
@@ -42,6 +43,32 @@ export const GET_USER_PROFILE = gql`
             title
           }
         }
+      }
+    }
+  }
+`;
+
+export const UPDATE_USER_AVATAR = gql`
+  mutation UpdateUserAvatar($username: String!, $avatar_url: String!) {
+    update_user(
+      where: { username: { _eq: $username } }
+      _set: { avatar_url: $avatar_url }
+    ) {
+      returning {
+        avatar_url
+      }
+    }
+  }
+`;
+
+export const UPDATE_USER_STATUS = gql`
+  mutation UpdateUserStatus($username: String!, $status: String!) {
+    update_user(
+      where: { username: { _eq: $username } }
+      _set: { status: $status }
+    ) {
+      returning {
+        status
       }
     }
   }

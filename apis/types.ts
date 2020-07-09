@@ -774,6 +774,7 @@ export interface GetUserProfile_user_replies {
 
 export interface GetUserProfile_user {
   __typename: "user";
+  id: uuid;
   username: string;
   avatar_url: string | null;
   status: string | null;

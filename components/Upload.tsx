@@ -62,9 +62,15 @@ export interface UploadProps {
   open: boolean;
   onClose?: () => void;
   onSubmit?: (url: string) => void;
+  mbLimit?: number;
 }
 
-const Upload: React.FC<UploadProps> = ({ open, onClose, onSubmit }) => {
+const Upload: React.FC<UploadProps> = ({
+  open,
+  onClose,
+  onSubmit,
+  mbLimit,
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
@@ -95,8 +101,8 @@ const Upload: React.FC<UploadProps> = ({ open, onClose, onSubmit }) => {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      setMessage("上传图片大小限制为 10 MB");
+    if (file.size > (mbLimit ?? 10) * 1024 * 1024) {
+      setMessage(`上传图片大小限制为 ${mbLimit} MB`);
       return;
     }
 
@@ -134,7 +140,7 @@ const Upload: React.FC<UploadProps> = ({ open, onClose, onSubmit }) => {
       disableBackdropClick
       disableEscapeKeyDown
     >
-      <DialogTitle>插入图片</DialogTitle>
+      <DialogTitle>添加图片</DialogTitle>
       <DialogContent className={classes.root}>
         <input
           ref={inputRef}
@@ -178,7 +184,7 @@ const Upload: React.FC<UploadProps> = ({ open, onClose, onSubmit }) => {
           取消
         </Button>
         <Button onClick={handleSubmit} color="primary" disabled={loading}>
-          插入
+          确定
         </Button>
       </DialogActions>
       <Snackbar
