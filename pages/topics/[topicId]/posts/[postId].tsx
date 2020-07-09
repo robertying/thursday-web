@@ -61,6 +61,15 @@ const useStyles = makeStyles((theme) =>
       width: "100%",
       display: "block",
     },
+    commentDialog: {
+      width: "100%",
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+    },
+    dialogContent: {
+      height: "100%",
+    },
   })
 );
 
@@ -299,31 +308,46 @@ const PostPage: React.FC = () => {
       <Dialog
         open={commentEditDialogOpen}
         onClose={handleCommentEditClose}
-        scroll="body"
         disableBackdropClick
         disableEscapeKeyDown
         fullScreen={fullScreen}
       >
         <DialogTitle>添加评论</DialogTitle>
-        <DialogContent>
+        {fullScreen && (
+          <DialogActions>
+            <Button onClick={handleCommentEditClose} color="primary">
+              取消
+            </Button>
+            <Button
+              onClick={handleCommentEdit}
+              color="primary"
+              disabled={loading}
+            >
+              发布
+            </Button>
+          </DialogActions>
+        )}
+        <DialogContent classes={{ root: classes.dialogContent }}>
           <Editor
             compact
             onChange={setCommentValue}
             onPlainTextChange={setCommentPlainValue}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCommentEditClose} color="primary">
-            取消
-          </Button>
-          <Button
-            onClick={handleCommentEdit}
-            color="primary"
-            disabled={loading}
-          >
-            发布
-          </Button>
-        </DialogActions>
+        {!fullScreen && (
+          <DialogActions>
+            <Button onClick={handleCommentEditClose} color="primary">
+              取消
+            </Button>
+            <Button
+              onClick={handleCommentEdit}
+              color="primary"
+              disabled={loading}
+            >
+              发布
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
       <Dialog onClose={handleShareDialogClose} open={shareDialogOpen}>
         <DialogTitle>分享</DialogTitle>

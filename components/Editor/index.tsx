@@ -55,7 +55,8 @@ const useStyles = makeStyles((theme) =>
       border: "none",
       outline: "none",
       boxShadow: "none",
-      boxSizing: "initial",
+      width: "100%",
+      boxSizing: "border-box",
       backgroundColor: (props: { readonly?: boolean }) =>
         props.readonly
           ? theme.palette.background.paper
