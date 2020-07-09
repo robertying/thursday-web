@@ -4,7 +4,6 @@ import {
   Typography,
   CardActionArea,
   Grid,
-  Avatar,
   CardHeader,
 } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
@@ -12,6 +11,7 @@ import { makeStyles, createStyles } from "@material-ui/core/styles";
 import dayjs from "dayjs";
 import { GetTopicPosts_topic_posts } from "apis/types";
 import { getPlainText, deserialize } from "lib/slatejs";
+import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -40,6 +40,14 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
+const truncateContent = (text: string) => {
+  const length = 100;
+  if (text.length > length) {
+    return text.substr(0, length) + "...";
+  }
+  return text;
+};
+
 const PostCard: React.FC<GetTopicPosts_topic_posts> = ({
   title,
   content,
@@ -64,7 +72,7 @@ const PostCard: React.FC<GetTopicPosts_topic_posts> = ({
         />
         <CardContent>
           <Typography className={classes.title} variant="body1">
-            {getPlainText(deserialize(content))}
+            {truncateContent(getPlainText(deserialize(content)))}
           </Typography>
           <Grid
             container

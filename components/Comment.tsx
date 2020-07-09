@@ -4,7 +4,6 @@ import {
   CardContent,
   CardActions,
   CardHeader,
-  Avatar,
   IconButton,
   Button,
   Grid,
@@ -16,6 +15,7 @@ import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
 import { GetPost_post_comments, emoji_reaction_enum } from "apis/types";
 import { deserialize } from "lib/slatejs";
+import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

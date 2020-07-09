@@ -4,7 +4,6 @@ import {
   CardContent,
   CardActions,
   CardHeader,
-  Avatar,
   IconButton,
   Grid,
 } from "@material-ui/core";
@@ -15,6 +14,7 @@ import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
 import { GetPost_post, emoji_reaction_enum } from "apis/types";
 import { deserialize } from "lib/slatejs";
+import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

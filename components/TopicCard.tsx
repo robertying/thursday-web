@@ -4,11 +4,11 @@ import {
   Typography,
   CardActionArea,
   Grid,
-  Avatar,
 } from "@material-ui/core";
 import { AvatarGroup } from "@material-ui/lab";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { GetTopics_topic } from "apis/types";
+import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

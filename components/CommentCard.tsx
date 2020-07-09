@@ -4,9 +4,9 @@ import {
   Typography,
   CardContent,
   CardHeader,
-  Avatar,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
+import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

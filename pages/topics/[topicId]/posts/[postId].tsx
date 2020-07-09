@@ -12,7 +12,6 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  Avatar,
   ListItemText,
 } from "@material-ui/core";
 import { makeStyles, createStyles, useTheme } from "@material-ui/core/styles";
@@ -48,6 +47,7 @@ import { ADD_COMMENT } from "apis/comment";
 import { serialize, getNodes, isEmpty } from "lib/slatejs";
 import { GET_USER } from "apis/user";
 import { isMobile } from "lib/platform";
+import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

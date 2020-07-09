@@ -10,6 +10,7 @@ import { initializeApollo } from "apis/client";
 import { GetUserProfile, GetUserProfileVariables } from "apis/types";
 import { GET_USER_PROFILE } from "apis/user";
 import dayjs from "dayjs";
+import Avatar from "components/Avatar";
 
 const useStyles = makeStyles((theme) =>
   createStyles({

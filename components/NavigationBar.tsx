@@ -6,7 +6,6 @@ import {
   Tab,
   Tabs,
   IconButton,
-  Avatar,
   Grid,
   CircularProgress,
   List,
@@ -33,6 +32,7 @@ import { useLazyQuery } from "@apollo/client";
 import { GetActivities, GetActivitiesVariables } from "apis/types";
 import { GET_ACTIVITIES } from "apis/activity";
 import useUserId from "lib/useUserId";
+import Avatar from "components/Avatar";
 import ElevateOnScroll from "./ElevateOnScroll";
 
 const useStyles = makeStyles((theme) =>
