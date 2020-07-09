@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Transforms } from "slate";
 import {
   useSlate,
@@ -10,15 +11,16 @@ import isUrl from "is-url";
 import { IconButton } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Image as ImageIcon } from "@material-ui/icons";
-import imageExtensions from "./imageExtensions.json";
 import Upload from "components/Upload";
-import { useState } from "react";
+import Picture from "components/Picture";
+import imageExtensions from "./imageExtensions.json";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
     root: (props: { selected: boolean; focused: boolean }) => ({
       display: "block",
       maxHeight: "20em",
+      margin: "auto",
       boxShadow:
         props.selected && props.focused
           ? `0 0 0 2px ${theme.palette.primary.main}`
@@ -39,7 +41,7 @@ export const Image = ({
   return (
     <div {...attributes}>
       <div contentEditable={false}>
-        <img
+        <Picture
           className={classes.root}
           src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${element.url}`}
           alt={(element.alt as string | undefined) ?? "已上传图片"}
