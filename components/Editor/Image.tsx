@@ -8,7 +8,7 @@ import {
   RenderElementProps,
 } from "slate-react";
 import isUrl from "is-url";
-import { IconButton } from "@material-ui/core";
+import { IconButton, Modal } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Image as ImageIcon } from "@material-ui/icons";
 import Upload from "components/Upload";
@@ -17,15 +17,27 @@ import imageExtensions from "./imageExtensions.json";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
-    root: (props: { selected: boolean; focused: boolean }) => ({
+    root: {
       display: "block",
-      maxHeight: "20em",
       margin: "auto",
-      boxShadow:
-        props.selected && props.focused
+      objectFit: "contain",
+      width: "100%",
+      boxShadow: (props: {
+        selected: boolean;
+        focused: boolean;
+        preview: boolean;
+      }) =>
+        props.selected && props.focused && !props.preview
           ? `0 0 0 2px ${theme.palette.primary.main}`
           : "none",
-    }),
+    },
+    modal: {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: "90vw",
+    },
   })
 );
 
@@ -36,7 +48,8 @@ export const Image = ({
 }: RenderElementProps) => {
   const selected = useSelected();
   const focused = useFocused();
-  const classes = useStyles({ selected, focused });
+  const [open, setOpen] = useState(false);
+  const classes = useStyles({ selected, focused, preview: open });
 
   return (
     <div {...attributes}>
@@ -45,7 +58,17 @@ export const Image = ({
           className={classes.root}
           src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${element.url}`}
           alt={(element.alt as string | undefined) ?? "已上传图片"}
+          onClick={() => setOpen(true)}
         />
+        <Modal open={open} onClose={() => setOpen(false)}>
+          <div className={classes.modal}>
+            <Picture
+              className={classes.root}
+              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${element.url}`}
+              alt={(element.alt as string | undefined) ?? "已上传图片"}
+            />
+          </div>
+        </Modal>
       </div>
       {children}
     </div>
