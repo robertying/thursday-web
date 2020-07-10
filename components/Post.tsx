@@ -8,7 +8,7 @@ import {
   Grid,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { Share, Favorite } from "@material-ui/icons";
+import { Share } from "@material-ui/icons";
 import dayjs from "dayjs";
 import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
