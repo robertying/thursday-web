@@ -74,7 +74,11 @@ const Post: React.FC<GetPost_post & PostProps> = ({
           {title}
         </Typography>
         <MyEditor defaultValue={deserialize(content)} readonly />
-        <Typography className={classes.date} variant="caption">
+        <Typography
+          className={classes.date}
+          variant="caption"
+          color="textSecondary"
+        >
           编辑于 {dayjs(updated_at).fromNow()}
         </Typography>
       </CardContent>
@@ -92,9 +96,9 @@ const Post: React.FC<GetPost_post & PostProps> = ({
             />
           </Grid>
           <Grid item>
-            <IconButton>
+            {/* <IconButton>
               <Favorite />
-            </IconButton>
+            </IconButton> */}
             <IconButton onClick={() => onShare?.(id)}>
               <Share />
             </IconButton>

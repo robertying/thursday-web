@@ -517,6 +517,70 @@ export interface DeleteReactionVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: AddReply
+// ====================================================
+
+export interface AddReply_insert_reply_one {
+  __typename: "reply";
+  id: number;
+}
+
+export interface AddReply {
+  /**
+   * insert a single row into the table: "reply"
+   */
+  insert_reply_one: AddReply_insert_reply_one | null;
+}
+
+export interface AddReplyVariables {
+  author_id: uuid;
+  content: string;
+  comment_id: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: GetReplies
+// ====================================================
+
+export interface GetReplies_reply_author {
+  __typename: "user";
+  username: string;
+  avatar_url: string | null;
+}
+
+export interface GetReplies_reply {
+  __typename: "reply";
+  id: number;
+  created_at: timestamptz;
+  content: string;
+  /**
+   * An object relationship
+   */
+  author: GetReplies_reply_author;
+}
+
+export interface GetReplies {
+  /**
+   * fetch data from the table: "reply"
+   */
+  reply: GetReplies_reply[];
+}
+
+export interface GetRepliesVariables {
+  comment_id: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: GetTopicPosts
 // ====================================================
 

@@ -13,10 +13,11 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
+  CircularProgress,
 } from "@material-ui/core";
 import { makeStyles, createStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "@material-ui/icons";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
@@ -25,7 +26,7 @@ import Post from "components/Post";
 import Comment from "components/Comment";
 import Layout from "components/Layout";
 import FloatingActions from "components/FloatingActions";
-import CommentCard from "components/CommentCard";
+import ReplyCard from "components/ReplyCard";
 import Editor from "components/Editor";
 import {
   GetPost,
@@ -37,6 +38,10 @@ import {
   AddCommentVariables,
   GetUser,
   GetUserVariables,
+  AddReply,
+  AddReplyVariables,
+  GetReplies,
+  GetRepliesVariables,
 } from "apis/types";
 import { initializeApollo } from "apis/client";
 import { GET_POST } from "apis/post";
@@ -48,6 +53,7 @@ import { serialize, getNodes, isEmpty } from "lib/slatejs";
 import { GET_USER } from "apis/user";
 import { isMobile } from "lib/platform";
 import Avatar from "components/Avatar";
+import { ADD_REPLY, GET_REPLIES } from "apis/reply";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -69,6 +75,9 @@ const useStyles = makeStyles((theme) =>
     },
     dialogContent: {
       height: "100%",
+    },
+    dialogContentLoading: {
+      textAlign: "center",
     },
   })
 );
@@ -161,20 +170,30 @@ const PostPage: React.FC = () => {
     refetch();
   };
 
-  const [commentModalVisible, setCommentModalVisible] = useState(false);
+  const [replyModalVisible, setReplyModalVisible] = useState(false);
 
-  const handleModalClose = () => {
-    setCommentModalVisible(false);
+  const handleReplyModalClose = () => {
+    setReplyModalVisible(false);
+    setCommentId(null);
   };
 
   const [commentEditDialogOpen, setCommentEditDialogOpen] = useState(false);
   const [commentValue, setCommentValue] = useState<Node[]>([]);
   const [commentPlainValue, setCommentPlainValue] = useState("");
+  const [commentId, setCommentId] = useState<number | null>(null);
 
-  const [addComment, { loading, error, data: addCommentData }] = useMutation<
-    AddComment,
-    AddCommentVariables
-  >(ADD_COMMENT);
+  const [
+    addComment,
+    {
+      loading: addCommentLoading,
+      error: addCommentError,
+      data: addCommentData,
+    },
+  ] = useMutation<AddComment, AddCommentVariables>(ADD_COMMENT);
+  const [
+    addReply,
+    { loading: addReplyLoading, error: addReplyError, data: addReplyData },
+  ] = useMutation<AddReply, AddReplyVariables>(ADD_REPLY);
 
   useEffect(() => {
     if (addCommentData) {
@@ -191,10 +210,31 @@ const PostPage: React.FC = () => {
   }, [addCommentData]);
 
   useEffect(() => {
-    if (error) {
+    if (addReplyData) {
+      (async () => {
+        setCommentEditDialogOpen(false);
+        await refetch();
+        setReplyModalVisible(true);
+        router.push(
+          `${router.asPath.split("#")[0]}#reply-${
+            addReplyData.insert_reply_one?.id
+          }`
+        );
+      })();
+    }
+  }, [addReplyData]);
+
+  useEffect(() => {
+    if (addCommentError) {
       setMessage("评论发表失败");
     }
-  }, [error]);
+  }, [addCommentError]);
+
+  useEffect(() => {
+    if (addReplyError) {
+      setMessage("评论发表失败");
+    }
+  }, [addReplyError]);
 
   const handleCommentEditClick = () => {
     setCommentEditDialogOpen(true);
@@ -202,6 +242,7 @@ const PostPage: React.FC = () => {
 
   const handleCommentEditClose = () => {
     setCommentEditDialogOpen(false);
+    setCommentId(null);
   };
 
   const handleCommentEdit = async () => {
@@ -220,14 +261,47 @@ const PostPage: React.FC = () => {
       v = serialize(commentValue);
     }
 
-    await addComment({
-      variables: {
-        author_id: userId!,
-        post_id: parseInt(postId as string, 10),
-        content: v,
-      },
-    });
+    if (commentId) {
+      await addReply({
+        variables: {
+          author_id: userId!,
+          comment_id: commentId,
+          content: v,
+        },
+      });
+    } else {
+      await addComment({
+        variables: {
+          author_id: userId!,
+          post_id: parseInt(postId as string, 10),
+          content: v,
+        },
+      });
+    }
   };
+
+  const [
+    getReplies,
+    { data: replyData, loading: replyLoading, error: replyError },
+  ] = useLazyQuery<GetReplies, GetRepliesVariables>(GET_REPLIES, {
+    fetchPolicy: "network-only",
+  });
+
+  useEffect(() => {
+    if (replyModalVisible && commentId) {
+      getReplies({
+        variables: {
+          comment_id: commentId,
+        },
+      });
+    }
+  }, [replyModalVisible, commentId]);
+
+  useEffect(() => {
+    if (replyError) {
+      setMessage("回复加载失败");
+    }
+  }, [replyError]);
 
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [sharedUrl, setSharedUrl] = useState("");
@@ -286,21 +360,33 @@ const PostPage: React.FC = () => {
               {...comment}
               onReact={handleReactComment}
               onShare={(id) => handleShareDialogOpen("comment", id)}
+              onReplyButtonClick={() => {
+                setCommentId(comment.id);
+                setReplyModalVisible(true);
+              }}
+              onReply={(id) => {
+                setCommentId(id);
+                handleCommentEditClick();
+              }}
             />
           </Grid>
         ))}
       </Grid>
       <Dialog
-        open={commentModalVisible}
-        onClose={handleModalClose}
+        open={replyModalVisible}
+        onClose={handleReplyModalClose}
         scroll="body"
-        aria-labelledby="comment-dialog-title"
-        aria-describedby="comment-dialog-description"
+        fullWidth
       >
-        <DialogTitle id="comment-dialog-title">评论</DialogTitle>
-        <DialogContent id="comment-dialog-description">
-          {[...new Array(50)].map((v, i) => (
-            <CommentCard key={i} />
+        <DialogTitle>回复</DialogTitle>
+        <DialogContent>
+          {replyLoading && (
+            <div className={classes.dialogContentLoading}>
+              <CircularProgress />
+            </div>
+          )}
+          {replyData?.reply.map((reply) => (
+            <ReplyCard key={reply.id} {...reply} />
           ))}
         </DialogContent>
       </Dialog>
@@ -312,7 +398,7 @@ const PostPage: React.FC = () => {
         disableEscapeKeyDown
         fullScreen={fullScreen}
       >
-        <DialogTitle>添加评论</DialogTitle>
+        <DialogTitle>{commentId ? "添加回复" : "添加评论"}</DialogTitle>
         {fullScreen && (
           <DialogActions>
             <Button onClick={handleCommentEditClose} color="primary">
@@ -321,7 +407,7 @@ const PostPage: React.FC = () => {
             <Button
               onClick={handleCommentEdit}
               color="primary"
-              disabled={loading}
+              disabled={addCommentLoading || addReplyLoading}
             >
               发布
             </Button>
@@ -342,7 +428,7 @@ const PostPage: React.FC = () => {
             <Button
               onClick={handleCommentEdit}
               color="primary"
-              disabled={loading}
+              disabled={addCommentLoading || addReplyLoading}
             >
               发布
             </Button>

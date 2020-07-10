@@ -81,7 +81,11 @@ const PostCard: React.FC<GetTopicPosts_topic_posts> = ({
             alignItems="center"
           >
             <Grid item xs>
-              <Typography className={classes.date} variant="caption">
+              <Typography
+                className={classes.date}
+                variant="caption"
+                color="textSecondary"
+              >
                 {dayjs(updated_at).fromNow()}
               </Typography>
             </Grid>

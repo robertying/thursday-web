@@ -9,7 +9,12 @@ import {
   Grid,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { Share, Favorite, Comment as CommentIcon } from "@material-ui/icons";
+import {
+  Share,
+  Favorite,
+  Comment as CommentIcon,
+  Reply,
+} from "@material-ui/icons";
 import dayjs from "dayjs";
 import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
@@ -37,6 +42,7 @@ const useStyles = makeStyles((theme) =>
     row: {
       display: "flex",
       flexDirection: "row",
+      alignItems: "center",
       "& > *": {
         marginLeft: 4,
         marginRight: 4,
@@ -48,7 +54,8 @@ const useStyles = makeStyles((theme) =>
 export interface CommentProps {
   onReact?: (commentId: number, reaction: emoji_reaction_enum) => void;
   onShare?: (commentId: number) => void;
-  onCommentButtonClick?: () => void;
+  onReply?: (commentId: number) => void;
+  onReplyButtonClick?: () => void;
 }
 
 const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
@@ -60,7 +67,8 @@ const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
   reaction_aggregate,
   onReact,
   onShare,
-  onCommentButtonClick,
+  onReply,
+  onReplyButtonClick,
 }) => {
   const classes = useStyles();
 
@@ -95,11 +103,11 @@ const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
           alignItems="center"
         >
           <div className={classes.row}>
-            {onCommentButtonClick && (
+            {onReplyButtonClick && replies_aggregate.aggregate?.count !== 0 && (
               <Grid item>
                 <Button
                   startIcon={<CommentIcon color="action" />}
-                  onClick={onCommentButtonClick}
+                  onClick={onReplyButtonClick}
                 >
                   {replies_aggregate.aggregate?.count}
                 </Button>
@@ -114,10 +122,15 @@ const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
           </div>
           <div className={classes.row}>
             <Grid item>
+              <IconButton onClick={() => onReply?.(id)}>
+                <Reply />
+              </IconButton>
+            </Grid>
+            {/* <Grid item>
               <IconButton>
                 <Favorite />
               </IconButton>
-            </Grid>
+            </Grid> */}
             <Grid item>
               <IconButton onClick={() => onShare?.(id)}>
                 <Share />
