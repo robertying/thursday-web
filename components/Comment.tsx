@@ -11,7 +11,6 @@ import {
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import {
   Share,
-  Favorite,
   Comment as CommentIcon,
   Reply,
 } from "@material-ui/icons";
