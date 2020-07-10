@@ -186,7 +186,7 @@ const LoginPage: React.FC = () => {
           <Avatar className={classes.logo} src="/logo.png" alt="logo" />
           <TextField
             label="用户名"
-            type="username"
+            type="text"
             autoComplete="username"
             fullWidth
             value={values.username}
