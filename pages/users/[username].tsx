@@ -204,7 +204,12 @@ const ProfilePage: React.FC = () => {
             </IconButton>
           )}
         </Typography>
-        <Typography variant="caption" gutterBottom className={classes.date}>
+        <Typography
+          variant="caption"
+          gutterBottom
+          className={classes.date}
+          color="textSecondary"
+        >
           于 {dayjs(user?.created_at).fromNow()} 加入
         </Typography>
         <Typography variant="h5" gutterBottom className={classes.subtitle}>
@@ -212,6 +217,7 @@ const ProfilePage: React.FC = () => {
         </Typography>
       </Grid>
       <Upload
+        avatar
         open={uploadOpen}
         onClose={() => setUploadOpen(false)}
         onSubmit={handleAvatarUpload}

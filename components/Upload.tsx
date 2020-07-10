@@ -60,6 +60,7 @@ const useStyles = makeStyles((theme) =>
 
 export interface UploadProps {
   open: boolean;
+  avatar?: boolean;
   onClose?: () => void;
   onSubmit?: (url: string) => void;
   mbLimit?: number;
@@ -70,6 +71,7 @@ const Upload: React.FC<UploadProps> = ({
   onClose,
   onSubmit,
   mbLimit,
+  avatar,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -167,6 +169,11 @@ const Upload: React.FC<UploadProps> = ({
           />
           {loading && <CircularProgress className={classes.loading} />}
         </label>
+        {avatar && (
+          <Typography variant="caption">
+            头像会根据上传图片的长宽进行居中裁剪
+          </Typography>
+        )}
         <div>
           <Button
             variant="contained"
