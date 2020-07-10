@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
+      zIndex: 99,
       position: "fixed",
       bottom: theme.spacing(2),
       left: 0,
