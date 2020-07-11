@@ -184,6 +184,7 @@ const LoginPage: React.FC = () => {
       ) : (
         <Paper className={classes.paper} component="form" elevation={8}>
           <Avatar className={classes.logo} src="/logo.png" alt="logo" />
+          <Typography>星期四｜Thursday</Typography>
           <TextField
             label="用户名"
             type="text"
