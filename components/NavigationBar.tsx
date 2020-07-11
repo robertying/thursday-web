@@ -169,31 +169,33 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   <StyledTab label="话题" value="topics" />
                 </Tabs>
               </Grid>
-              {username && (
-                <>
-                  <Grid item>
-                    <IconButton
-                      onClick={handleActivityClick}
-                      size={sm ? "small" : "medium"}
-                    >
-                      <Notifications />
+              <Grid
+                item
+                style={{ visibility: username ? "visible" : "hidden" }}
+              >
+                <IconButton
+                  onClick={handleActivityClick}
+                  size={sm ? "small" : "medium"}
+                >
+                  <Notifications />
+                </IconButton>
+              </Grid>
+              <Grid
+                item
+                style={{ visibility: username ? "visible" : "hidden" }}
+              >
+                <Link href="/users/[username]" as={`/users/${username}`}>
+                  <a>
+                    <IconButton className={classes.avatarIcon}>
+                      <Avatar
+                        className={classes.avatar}
+                        src={userAvatarUrl ?? undefined}
+                        alt={username}
+                      />
                     </IconButton>
-                  </Grid>
-                  <Grid item>
-                    <Link href="/users/[username]" as={`/users/${username}`}>
-                      <a>
-                        <IconButton className={classes.avatarIcon}>
-                          <Avatar
-                            className={classes.avatar}
-                            src={userAvatarUrl ?? undefined}
-                            alt={username}
-                          />
-                        </IconButton>
-                      </a>
-                    </Link>
-                  </Grid>
-                </>
-              )}
+                  </a>
+                </Link>
+              </Grid>
             </Grid>
           </Container>
         </AppBar>
