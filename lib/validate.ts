@@ -31,5 +31,7 @@ export const validateUsername = (username: string) => {
  * with at least one lowercase, one uppercase, and one number respectively
  */
 export const validatePassword = (password: string) => {
-  return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password);
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*#?&]{8,}$/.test(
+    password
+  );
 };
