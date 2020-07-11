@@ -12,9 +12,16 @@ import {
   DialogActions,
   TextField,
   Button,
+  InputAdornment,
+  DialogContentText,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { PhotoCamera, Edit } from "@material-ui/icons";
+import {
+  PhotoCamera,
+  Edit,
+  Visibility,
+  VisibilityOff,
+} from "@material-ui/icons";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
@@ -41,6 +48,8 @@ import dayjs from "dayjs";
 import useUserId from "lib/useUserId";
 import Upload from "components/Upload";
 import Avatar from "components/Avatar";
+import { changePassword, signOut } from "apis/cognito";
+import { validatePassword } from "lib/validate";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -77,6 +86,15 @@ const useStyles = makeStyles((theme) =>
     },
     editButton: {
       marginLeft: theme.spacing(1),
+    },
+    textField: {
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
+    },
+    buttons: {
+      "& > *": {
+        margin: `0px ${theme.spacing(1)}px`,
+      },
     },
   })
 );
@@ -164,6 +182,78 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const [passwordEdit, setPasswordEdit] = useState(false);
+  const [passwordValues, setPasswordValues] = useState({
+    oldPassword: "",
+    newPassword: "",
+    showPassword: false,
+  });
+
+  const handlePasswordEditOpen = () => {
+    setPasswordEdit(true);
+  };
+
+  const handlePasswordEditClose = () => {
+    setPasswordEdit(false);
+  };
+
+  const handlePasswordUpdate = async () => {
+    if (!passwordValues.oldPassword) {
+      setMessage("请填写当前密码");
+      return;
+    }
+
+    if (!validatePassword(passwordValues.newPassword)) {
+      setMessage("新密码不符合要求");
+      return;
+    }
+
+    try {
+      await changePassword(
+        passwordValues.oldPassword,
+        passwordValues.newPassword
+      );
+      handlePasswordEditClose();
+      setMessage("密码更改成功");
+    } catch {
+      setMessage("密码更改失败");
+    }
+  };
+
+  const handlePasswordChange = (
+    prop: "newPassword" | "oldPassword" | "showPassword"
+  ) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordValues({ ...passwordValues, [prop]: event.target.value.trim() });
+  };
+
+  const handleClickShowPassword = () => {
+    setPasswordValues({
+      ...passwordValues,
+      showPassword: !passwordValues.showPassword,
+    });
+  };
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+
+  const [signOutOpen, setSignOutOpen] = useState(false);
+
+  const handleSignOutClose = () => {
+    setSignOutOpen(false);
+  };
+
+  const handleSignOutOpen = () => {
+    setSignOutOpen(true);
+  };
+
+  const handleSignOut = async () => {
+    signOut();
+    router.push("/login");
+  };
+
   return (
     <Layout
       page="others"
@@ -177,6 +267,7 @@ const ProfilePage: React.FC = () => {
         component={Container}
         direction="column"
         maxWidth="md"
+        alignItems="flex-start"
       >
         <ButtonBase
           className={classes.avatarOverlay}
@@ -204,17 +295,27 @@ const ProfilePage: React.FC = () => {
             </IconButton>
           )}
         </Typography>
+        {self && (
+          <div className={classes.buttons}>
+            <Button variant="contained" onClick={handlePasswordEditOpen}>
+              更改密码
+            </Button>
+            <Button variant="contained" onClick={handleSignOutOpen}>
+              退出登录
+            </Button>
+          </div>
+        )}
         <Typography
           variant="caption"
           gutterBottom
           className={classes.date}
           color="textSecondary"
         >
-          于 {dayjs(user?.created_at).fromNow()} 加入
+          于 {dayjs(user?.created_at).fromNow()}加入
         </Typography>
-        <Typography variant="h5" gutterBottom className={classes.subtitle}>
+        {/* <Typography variant="h5" gutterBottom className={classes.subtitle}>
           活动
-        </Typography>
+        </Typography> */}
       </Grid>
       <Upload
         avatar
@@ -241,6 +342,86 @@ const ProfilePage: React.FC = () => {
             取消
           </Button>
           <Button onClick={handleStatusUpdate} color="primary">
+            确定
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog fullWidth open={passwordEdit} onClose={handlePasswordEditClose}>
+        <DialogTitle>更改密码</DialogTitle>
+        <DialogContent>
+          <TextField
+            className={classes.textField}
+            label="当前密码"
+            autoComplete="current-password"
+            type={passwordValues.showPassword ? "text" : "password"}
+            fullWidth
+            value={passwordValues.oldPassword}
+            onChange={handlePasswordChange("oldPassword")}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {passwordValues.showPassword ? (
+                      <Visibility />
+                    ) : (
+                      <VisibilityOff />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            className={classes.textField}
+            label="新密码"
+            helperText="长度至少为 8，需包含大小写字母及数字"
+            autoComplete="new-password"
+            type={passwordValues.showPassword ? "text" : "password"}
+            fullWidth
+            value={passwordValues.newPassword}
+            onChange={handlePasswordChange("newPassword")}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {passwordValues.showPassword ? (
+                      <Visibility />
+                    ) : (
+                      <VisibilityOff />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePasswordEditClose} color="primary">
+            取消
+          </Button>
+          <Button onClick={handlePasswordUpdate} color="primary">
+            确定
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={signOutOpen} onClose={handleSignOutClose}>
+        <DialogTitle>退出登录</DialogTitle>
+        <DialogContent>
+          <DialogContentText>确定退出登录？</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleSignOutClose} color="primary">
+            取消
+          </Button>
+          <Button onClick={handleSignOut} color="primary">
             确定
           </Button>
         </DialogActions>

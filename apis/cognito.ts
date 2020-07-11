@@ -120,6 +120,65 @@ export const login = (username: string, password: string) => {
   });
 };
 
+export const signOut = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { user } = await getUserSession();
+
+      user.signOut();
+      return resolve();
+    } catch (e) {
+      return reject(e);
+    }
+  });
+};
+
+export const forgotPassword = (username: string) => {
+  return new Promise((resolve, reject) => {
+    const cognitoUser = new CognitoUser({
+      Username: username,
+      Pool: userPool,
+      Storage: new CookieStorage({
+        domain,
+        secure,
+      }),
+    });
+    cognitoUser.forgotPassword({
+      onSuccess: function (data) {
+        return resolve(data);
+      },
+      onFailure: function (err) {
+        return reject(err);
+      },
+    });
+  });
+};
+
+export const confirmPassword = (
+  username: string,
+  code: string,
+  newPassword: string
+) => {
+  return new Promise((resolve, reject) => {
+    const cognitoUser = new CognitoUser({
+      Username: username,
+      Pool: userPool,
+      Storage: new CookieStorage({
+        domain,
+        secure,
+      }),
+    });
+    cognitoUser.confirmPassword(code, newPassword, {
+      onSuccess: function () {
+        return resolve();
+      },
+      onFailure: function (err) {
+        return reject(err);
+      },
+    });
+  });
+};
+
 export const getUserSession = () => {
   return new Promise<{
     user: CognitoUser;
@@ -155,5 +214,22 @@ export const getUserAttributes = (user: CognitoUser) => {
         return resolve(result);
       });
     });
+  });
+};
+
+export const changePassword = (oldPassword: string, newPassword: string) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { user } = await getUserSession();
+
+      user.changePassword(oldPassword, newPassword, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(result);
+      });
+    } catch (e) {
+      return reject(e);
+    }
   });
 };

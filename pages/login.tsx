@@ -165,6 +165,8 @@ const LoginPage: React.FC = () => {
         setNeedVerification(true);
       } else if (err.code === "UsernameExistsException") {
         setMessage("用户已存在");
+      } else if (err.code === "NotAuthorizedException") {
+        setMessage("用户名或密码错误");
       } else {
         setMessage(err.message);
       }
@@ -238,6 +240,9 @@ const LoginPage: React.FC = () => {
               </a>
             </Link>
           )}
+          <Link href="/forgot">
+            <a>找回密码</a>
+          </Link>
           <div className={classes.buttons}>
             <Link href="/register">
               <a>
