@@ -941,6 +941,36 @@ export interface UpdateUserStatusVariables {
 // @generated
 // This file was automatically generated and should not be edited.
 
+// ====================================================
+// GraphQL mutation operation: UpdatePushSubscription
+// ====================================================
+
+export interface UpdatePushSubscription_update_user_by_pk {
+  __typename: "user";
+  id: uuid;
+  /**
+   * A computed field, executes function "user_web_push_enabled"
+   */
+  web_push_enabled: boolean | null;
+}
+
+export interface UpdatePushSubscription {
+  /**
+   * update single row of the table: "user"
+   */
+  update_user_by_pk: UpdatePushSubscription_update_user_by_pk | null;
+}
+
+export interface UpdatePushSubscriptionVariables {
+  user_id: uuid;
+  web_push_subscription?: string | null;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
 //==============================================================
 // START Enums and Input Objects
 //==============================================================

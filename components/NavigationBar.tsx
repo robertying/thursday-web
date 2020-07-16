@@ -14,6 +14,11 @@ import {
   ListItemText,
   Popover,
   useMediaQuery,
+  Badge,
+  Switch,
+  FormControlLabel,
+  Divider,
+  Snackbar,
 } from "@material-ui/core";
 import {
   makeStyles,
@@ -32,6 +37,7 @@ import { useLazyQuery } from "@apollo/client";
 import { GetActivities, GetActivitiesVariables } from "apis/types";
 import { GET_ACTIVITIES } from "apis/activity";
 import useUserId from "lib/useUserId";
+import usePushSubscription from "lib/usePushSubscription";
 import Avatar from "components/Avatar";
 import ElevateOnScroll from "./ElevateOnScroll";
 
@@ -51,7 +57,7 @@ const useStyles = makeStyles((theme) =>
         height: 30,
       },
     },
-    paper: {
+    list: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -63,6 +69,9 @@ const useStyles = makeStyles((theme) =>
     },
     inline: {
       display: "inline",
+    },
+    switch: {
+      margin: theme.spacing(1),
     },
   })
 );
@@ -96,7 +105,20 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const userId = useUserId();
+  const [pushEnabled, subscribe] = usePushSubscription();
+
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [message, setMessage] = useState("");
+
+  const [getActivities, { data, loading }] = useLazyQuery<
+    GetActivities,
+    GetActivitiesVariables
+  >(GET_ACTIVITIES);
+
+  const classes = useStyles({
+    loading: loading || data?.activity.length === 0,
+  });
 
   const handleActivityClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -108,11 +130,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
     setAnchorEl(null);
   };
 
-  const userId = useUserId();
-  const [getActivities, { data, loading }] = useLazyQuery<
-    GetActivities,
-    GetActivitiesVariables
-  >(GET_ACTIVITIES);
+  const handlePushChange = async (checked: boolean) => {
+    try {
+      await subscribe(checked);
+    } catch {
+      setMessage("通知权限未授予");
+    }
+  };
 
   useEffect(() => {
     if (anchorEl && userId) {
@@ -123,10 +147,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       });
     }
   }, [anchorEl, userId]);
-
-  const classes = useStyles({
-    loading: loading || data?.activity.length === 0,
-  });
 
   return (
     <>
@@ -177,7 +197,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   onClick={handleActivityClick}
                   size={sm ? "small" : "medium"}
                 >
-                  <Notifications />
+                  <Badge variant="dot" color="primary" invisible>
+                    <Notifications />
+                  </Badge>
                 </IconButton>
               </Grid>
               <Grid
@@ -201,7 +223,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         </AppBar>
       </ElevateOnScroll>
       <Popover
-        classes={{ paper: classes.paper }}
         open={anchorEl ? true : false}
         anchorEl={anchorEl}
         onClose={handleActivityClose}
@@ -215,82 +236,102 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         }}
         keepMounted
       >
-        {loading && <CircularProgress />}
-        {!loading && data?.activity.length === 0 && (
-          <>
-            <NotificationsNone />
-            <Typography variant="subtitle1">无活动</Typography>
-          </>
-        )}
-        {!loading && data?.activity.length !== 0 && (
-          <List>
-            {data?.activity.map((activity) => (
-              <ListItem key={activity.id}>
-                <ListItemAvatar>
-                  <Avatar
-                    alt={
-                      activity.comment?.author.username ??
-                      activity.reply?.author.username
-                    }
-                    src={
-                      activity.comment?.author.avatar_url ??
-                      activity.reply?.author.avatar_url ??
-                      undefined
+        <FormControlLabel
+          className={classes.switch}
+          control={
+            <Switch
+              checked={pushEnabled}
+              color="primary"
+              onChange={(e, checked) => handlePushChange(checked)}
+            />
+          }
+          label="推送通知"
+        />
+        <Divider />
+        <div className={classes.list}>
+          {loading && <CircularProgress />}
+          {!loading && data?.activity.length === 0 && (
+            <>
+              <NotificationsNone />
+              <Typography variant="subtitle1">无活动</Typography>
+            </>
+          )}
+          {!loading && data?.activity.length !== 0 && (
+            <List>
+              {data?.activity.map((activity) => (
+                <ListItem key={activity.id}>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt={
+                        activity.comment?.author.username ??
+                        activity.reply?.author.username
+                      }
+                      src={
+                        activity.comment?.author.avatar_url ??
+                        activity.reply?.author.avatar_url ??
+                        undefined
+                      }
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    secondary={
+                      <>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          className={classes.inline}
+                          color="textPrimary"
+                        >
+                          {activity.comment?.author.username ??
+                            activity.reply?.author.username}
+                        </Typography>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          className={classes.inline}
+                          color="textPrimary"
+                        >
+                          {activity.comment && (
+                            <span>
+                              {" "}
+                              评论了你的帖子{" "}
+                              <Link
+                                href="/topics/[topicId]/posts/[postId]"
+                                as={`/topics/${activity.comment.post?.topic_id}/posts/${activity.comment.post?.id}#comment-${activity.comment.id}`}
+                              >
+                                <a>{activity.comment.post?.title}</a>
+                              </Link>
+                            </span>
+                          )}
+                          {activity.reply && (
+                            <span>
+                              {" "}
+                              回复了你在帖子{" "}
+                              <Link
+                                href="/topics/[topicId]/posts/[postId]"
+                                as={`/topics/${activity.reply.comment.post?.topic_id}/posts/${activity.reply.comment.post?.id}#comment-${activity.reply.comment.id}?reply-${activity.reply.id}`}
+                              >
+                                <a>{activity.reply.comment.post?.title}</a>
+                              </Link>{" "}
+                              中的评论
+                            </span>
+                          )}
+                        </Typography>
+                      </>
                     }
                   />
-                </ListItemAvatar>
-                <ListItemText
-                  secondary={
-                    <>
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        className={classes.inline}
-                        color="textPrimary"
-                      >
-                        {activity.comment?.author.username ??
-                          activity.reply?.author.username}
-                      </Typography>
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        className={classes.inline}
-                        color="textPrimary"
-                      >
-                        {activity.comment && (
-                          <span>
-                            {" "}
-                            评论了你的帖子{" "}
-                            <Link
-                              href="/topics/[topicId]/posts/[postId]"
-                              as={`/topics/${activity.comment.post?.topic_id}/posts/${activity.comment.post?.id}#comment-${activity.comment.id}`}
-                            >
-                              <a>{activity.comment.post?.title}</a>
-                            </Link>
-                          </span>
-                        )}
-                        {activity.reply && (
-                          <span>
-                            {" "}
-                            回复了你在帖子{" "}
-                            <Link
-                              href="/topics/[topicId]/posts/[postId]"
-                              as={`/topics/${activity.reply.comment.post?.topic_id}/posts/${activity.reply.comment.post?.id}#comment-${activity.reply.comment.id}?reply-${activity.reply.id}`}
-                            >
-                              <a>{activity.reply.comment.post?.title}</a>
-                            </Link>{" "}
-                            中的评论
-                          </span>
-                        )}
-                      </Typography>
-                    </>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        )}
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </div>
       </Popover>
+      <Snackbar
+        open={message ? true : false}
+        autoHideDuration={3000}
+        onClose={() => setMessage("")}
+        message={<span>{message}</span>}
+      />
     </>
   );
 };

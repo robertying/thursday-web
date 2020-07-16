@@ -1,27 +1,82 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import webpush from "web-push";
+
+webpush.setVapidDetails(
+  "https://thu.community",
+  process.env.VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!
+);
 
 const url = `${process.env.API_URL}/v1/graphql`;
-const GET_POST_AUTHOR = `
-    query GetPostAuthor($post_id:Int!) {
-        post_by_pk(id: $post_id) {
-            author_id
+const GET_COMMENT = `
+  query GetComment($comment_id: Int!) {
+    comment_by_pk(id: $comment_id) {
+      author {
+        id
+        username
+      }
+      post {
+        title
+        topic_id
+        id
+        author {
+          id
+          web_push_subscription
         }
+      }
     }
+  }
 `;
-const GET_COMMENT_AUTHOR = `
-    query GetCommentAuthor($comment_id:Int!) {
-        comment_by_pk(id: $comment_id) {
-            author_id
+const GET_REPLY = `
+  query GetReply($reply_id:Int!) {
+    reply_by_pk(id: $reply_id) {
+      author {
+        id
+        username
+      }
+      comment {
+        id
+        author {
+          id
+          web_push_subscription
         }
+        post {
+          title
+          topic_id
+          id
+        }
+      }
     }
+  }
 `;
 const ADD_ACTIVITY = `
-    mutation AddActivity($id: String!, $comment_id: Int,  $reply_id: Int, $user_id: uuid!) {
-        insert_activity_one(object: {id: $id, user_id: $user_id, reply_id: $reply_id, comment_id: $comment_id}) {
-            id
-        }
+  mutation AddActivity($id: String!, $comment_id: Int,  $reply_id: Int, $user_id: uuid!) {
+    insert_activity_one(object: {id: $id, user_id: $user_id, reply_id: $reply_id, comment_id: $comment_id}) {
+      id
     }
+  }
 `;
+
+const sendWebPush = async (
+  subscription: string,
+  payload: {
+    title: string;
+    content: string;
+    url: string;
+  }
+) => {
+  try {
+    if (!subscription) {
+      return;
+    }
+    await webpush.sendNotification(
+      JSON.parse(subscription) as webpush.PushSubscription,
+      JSON.stringify(payload)
+    );
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
   return new Promise(async (resolve) => {
@@ -41,10 +96,10 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 
     if (type === "comment") {
       try {
-        const authorReq = {
-          query: GET_POST_AUTHOR,
+        const commentReq = {
+          query: GET_COMMENT,
           variables: {
-            post_id: data.post_id,
+            comment_id: data.id,
           },
         };
         let response = await fetch(url, {
@@ -53,18 +108,23 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             "content-type": "application/json",
             "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
           },
-          body: JSON.stringify(authorReq),
+          body: JSON.stringify(commentReq),
         });
 
         let json = await response.json();
-        const user_id = json?.data?.post_by_pk?.author_id;
+        const comment = json?.data?.comment_by_pk;
+
+        if (comment.author.id === comment.post.author.id) {
+          res.status(200).end();
+          return resolve();
+        }
 
         const graphqlReq = {
           query: ADD_ACTIVITY,
           variables: {
-            id: `${user_id}-comment-${data.id}`,
+            id: `${comment.post.author.id}-comment-${data.id}`,
             comment_id: data.id,
-            user_id,
+            user_id: comment.post.author.id,
           },
         };
         response = await fetch(url, {
@@ -80,6 +140,13 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
         if (json.errors) {
           throw new Error(json.errors[0].message);
         }
+
+        await sendWebPush(comment.post.author.web_push_subscription, {
+          title: "你收到了一条新评论",
+          content: `${comment.author.username} 评论了你的帖子 ${comment.post.title}`,
+          url: `/topics/${comment.post.topic_id}/posts/${comment.post.id}#comment-${data.id}`,
+        });
+
         res.status(200).end();
         return resolve();
       } catch (e) {
@@ -89,10 +156,10 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
       }
     } else if (type === "reply") {
       try {
-        const authorReq = {
-          query: GET_COMMENT_AUTHOR,
+        const replyReq = {
+          query: GET_REPLY,
           variables: {
-            comment_id: data.comment_id,
+            reply_id: data.id,
           },
         };
         let response = await fetch(url, {
@@ -101,18 +168,23 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             "content-type": "application/json",
             "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
           },
-          body: JSON.stringify(authorReq),
+          body: JSON.stringify(replyReq),
         });
 
         let json = await response.json();
-        const user_id = json?.data?.comment_by_pk?.author_id;
+        const reply = json?.data?.reply_by_pk;
+
+        if (reply.author.id === reply.comment.author.id) {
+          res.status(200).end();
+          return resolve();
+        }
 
         const graphqlReq = {
           query: ADD_ACTIVITY,
           variables: {
-            id: `${user_id}-reply-${data.id}`,
+            id: `${reply.comment.author.id}-reply-${data.id}`,
             reply_id: data.id,
-            user_id,
+            user_id: reply.comment.author.id,
           },
         };
         response = await fetch(url, {
@@ -128,6 +200,13 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
         if (json.errors) {
           throw new Error(json.errors[0].message);
         }
+
+        await sendWebPush(reply.comment.author.web_push_subscription, {
+          title: "你收到了一条新回复",
+          content: `${reply.author.username} 回复了你在帖子 ${reply.comment.post.title} 中的评论`,
+          url: `/topics/${reply.comment.post.topic_id}/posts/${reply.comment.post.id}#comment-${reply.comment.id}?reply-${data.id}`,
+        });
+
         res.status(200).end();
         return resolve();
       } catch (e) {

@@ -73,3 +73,18 @@ export const UPDATE_USER_STATUS = gql`
     }
   }
 `;
+
+export const UPDATE_PUSH_SUBSCRIPTION = gql`
+  mutation UpdatePushSubscription(
+    $user_id: uuid!
+    $web_push_subscription: String
+  ) {
+    update_user_by_pk(
+      pk_columns: { id: $user_id }
+      _set: { web_push_subscription: $web_push_subscription }
+    ) {
+      id
+      web_push_enabled
+    }
+  }
+`;
