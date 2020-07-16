@@ -95,7 +95,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             comment_id: data.comment_id,
           },
         };
-        const response = await fetch(url, {
+        let response = await fetch(url, {
           method: "POST",
           headers: {
             "content-type": "application/json",
@@ -115,7 +115,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             user_id,
           },
         };
-        await fetch(url, {
+        response = await fetch(url, {
           method: "POST",
           headers: {
             "content-type": "application/json",
