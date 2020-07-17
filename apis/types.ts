@@ -75,6 +75,7 @@ export interface GetActivities_activity {
   __typename: "activity";
   id: string;
   read: boolean;
+  created_at: timestamptz;
   /**
    * An object relationship
    */
@@ -94,6 +95,34 @@ export interface GetActivities {
 
 export interface GetActivitiesVariables {
   user_id: uuid;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: MarkActivityRead
+// ====================================================
+
+export interface MarkActivityRead_update_activity {
+  __typename: "activity_mutation_response";
+  /**
+   * number of affected rows by the mutation
+   */
+  affected_rows: number;
+}
+
+export interface MarkActivityRead {
+  /**
+   * update data of the table: "activity"
+   */
+  update_activity: MarkActivityRead_update_activity | null;
+}
+
+export interface MarkActivityReadVariables {
+  before: timestamptz;
 }
 
 /* tslint:disable */

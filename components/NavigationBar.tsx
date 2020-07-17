@@ -33,9 +33,14 @@ import {
 } from "@material-ui/icons";
 import Router from "next/router";
 import Link from "next/link";
-import { useLazyQuery } from "@apollo/client";
-import { GetActivities, GetActivitiesVariables } from "apis/types";
-import { GET_ACTIVITIES } from "apis/activity";
+import { useQuery, useMutation } from "@apollo/client";
+import {
+  GetActivities,
+  GetActivitiesVariables,
+  MarkActivityRead,
+  MarkActivityReadVariables,
+} from "apis/types";
+import { GET_ACTIVITIES, MARK_ACTIVITY_READ } from "apis/activity";
 import useUserId from "lib/useUserId";
 import usePushSubscription from "lib/usePushSubscription";
 import Avatar from "components/Avatar";
@@ -111,10 +116,19 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [message, setMessage] = useState("");
 
-  const [getActivities, { data, loading }] = useLazyQuery<
+  const { data, loading, refetch } = useQuery<
     GetActivities,
     GetActivitiesVariables
-  >(GET_ACTIVITIES);
+  >(GET_ACTIVITIES, {
+    variables: {
+      user_id: userId!,
+    },
+    skip: !userId,
+  });
+  const [markActivityRead] = useMutation<
+    MarkActivityRead,
+    MarkActivityReadVariables
+  >(MARK_ACTIVITY_READ);
 
   const classes = useStyles({
     loading: loading || data?.activity.length === 0,
@@ -139,13 +153,18 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   };
 
   useEffect(() => {
-    if (anchorEl && userId) {
-      getActivities({
-        variables: {
-          user_id: userId!,
-        },
-      });
-    }
+    (async () => {
+      if (anchorEl && userId) {
+        if (data?.activity[0]?.created_at) {
+          await markActivityRead({
+            variables: {
+              before: data?.activity[0]?.created_at,
+            },
+          });
+        }
+        await refetch();
+      }
+    })();
   }, [anchorEl, userId]);
 
   return (
@@ -197,7 +216,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   onClick={handleActivityClick}
                   size={sm ? "small" : "medium"}
                 >
-                  <Badge variant="dot" color="primary" invisible>
+                  <Badge
+                    variant="dot"
+                    color="primary"
+                    invisible={!data?.activity.some((i) => !i.read)}
+                  >
                     <Notifications />
                   </Badge>
                 </IconButton>
@@ -259,7 +282,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
           {!loading && data?.activity.length !== 0 && (
             <List>
               {data?.activity.map((activity) => (
-                <ListItem key={activity.id}>
+                <ListItem
+                  key={activity.id}
+                  style={{
+                    backgroundColor: activity.read
+                      ? "initial"
+                      : "rgb(255, 221,255)",
+                  }}
+                >
                   <ListItemAvatar>
                     <Avatar
                       alt={

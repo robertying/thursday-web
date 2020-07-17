@@ -18,6 +18,7 @@ export const GET_ACTIVITIES = gql`
     ) {
       id
       read
+      created_at
       comment {
         id
         author {
@@ -48,6 +49,17 @@ export const GET_ACTIVITIES = gql`
         }
         content
       }
+    }
+  }
+`;
+
+export const MARK_ACTIVITY_READ = gql`
+  mutation MarkActivityRead($before: timestamptz!) {
+    update_activity(
+      _set: { read: true }
+      where: { created_at: { _lte: $before } }
+    ) {
+      affected_rows
     }
   }
 `;
