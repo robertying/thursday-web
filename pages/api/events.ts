@@ -8,6 +8,7 @@ webpush.setVapidDetails(
 );
 
 const url = `${process.env.API_URL}/v1/graphql`;
+
 const GET_COMMENT = `
   query GetComment($comment_id: Int!) {
     comment_by_pk(id: $comment_id) {
@@ -28,7 +29,7 @@ const GET_COMMENT = `
   }
 `;
 const GET_REPLY = `
-  query GetReply($reply_id:Int!) {
+  query GetReply($reply_id: Int!) {
     reply_by_pk(id: $reply_id) {
       author {
         id
@@ -50,9 +51,80 @@ const GET_REPLY = `
   }
 `;
 const ADD_ACTIVITY = `
-  mutation AddActivity($id: String!, $comment_id: Int,  $reply_id: Int, $user_id: uuid!) {
-    insert_activity_one(object: {id: $id, user_id: $user_id, reply_id: $reply_id, comment_id: $comment_id}) {
+  mutation AddActivity(
+    $id: String!
+    $comment_id: Int
+    $reply_id: Int
+    $user_id: uuid!
+  ) {
+    insert_activity_one(
+      object: {
+        id: $id
+        user_id: $user_id
+        reply_id: $reply_id
+        comment_id: $comment_id
+      }
+    ) {
       id
+    }
+  }
+`;
+const ADD_POST_HISTORY = `
+  mutation AddPostHistory(
+    $post_id: Int!
+    $revision: Int!
+    $old_content: String!
+  ) {
+    insert_post_history_one(
+      object: { post_id: $post_id, revision: $revision, content: $old_content }
+    ) {
+      post_id
+    }
+    update_post_by_pk(pk_columns: { id: $post_id }, _inc: { revision: 1 }) {
+      revision
+    }
+  }
+`;
+const ADD_COMMENT_HISTORY = `
+  mutation AddCommentHistory(
+    $comment_id: Int!
+    $revision: Int!
+    $old_content: String!
+  ) {
+    insert_comment_history_one(
+      object: {
+        comment_id: $comment_id
+        revision: $revision
+        content: $old_content
+      }
+    ) {
+      comment_id
+    }
+    update_comment_by_pk(
+      pk_columns: { id: $comment_id }
+      _inc: { revision: 1 }
+    ) {
+      revision
+    }
+  }
+`;
+const ADD_REPLY_HISTORY = `
+  mutation AddReplyHistory(
+    $reply_id: Int!
+    $revision: Int!
+    $old_content: String!
+  ) {
+    insert_reply_history_one(
+      object: {
+        reply_id: $reply_id
+        revision: $revision
+        content: $old_content
+      }
+    ) {
+      reply_id
+    }
+    update_reply_by_pk(pk_columns: { id: $reply_id }, _inc: { revision: 1 }) {
+      revision
     }
   }
 `;
@@ -87,14 +159,15 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const data = req.body?.event?.data?.new;
+    const old = req.body?.event?.data?.old;
     if (!data) {
       res.status(500).end();
       return resolve();
     }
 
-    const type = req.body?.table?.name;
+    const type = req.body?.trigger?.name;
 
-    if (type === "comment") {
+    if (type === "add_comment_activity") {
       try {
         const commentReq = {
           query: GET_COMMENT,
@@ -154,7 +227,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
         res.status(500).end();
         return resolve();
       }
-    } else if (type === "reply") {
+    } else if (type === "add_reply_activity") {
       try {
         const replyReq = {
           query: GET_REPLY,
@@ -206,6 +279,99 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
           content: `${reply.author.username} 回复了你在帖子 ${reply.comment.post.title} 中的评论`,
           url: `/topics/${reply.comment.post.topic_id}/posts/${reply.comment.post.id}#comment-${reply.comment.id}?reply-${data.id}`,
         });
+
+        res.status(200).end();
+        return resolve();
+      } catch (e) {
+        console.error(e);
+        res.status(500).end();
+        return resolve();
+      }
+    } else if (type === "add_post_history") {
+      try {
+        const graphqlReq = {
+          query: ADD_POST_HISTORY,
+          variables: {
+            post_id: old.id,
+            revision: old.revision,
+            old_content: old.content,
+          },
+        };
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
+          },
+          body: JSON.stringify(graphqlReq),
+        });
+
+        const json = await response.json();
+        if (json.errors) {
+          throw new Error(json.errors[0].message);
+        }
+
+        res.status(200).end();
+        return resolve();
+      } catch (e) {
+        console.error(e);
+        res.status(500).end();
+        return resolve();
+      }
+    } else if (type === "add_comment_history") {
+      try {
+        const graphqlReq = {
+          query: ADD_COMMENT_HISTORY,
+          variables: {
+            comment_id: old.id,
+            revision: old.revision,
+            old_content: old.content,
+          },
+        };
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
+          },
+          body: JSON.stringify(graphqlReq),
+        });
+
+        const json = await response.json();
+        if (json.errors) {
+          throw new Error(json.errors[0].message);
+        }
+
+        res.status(200).end();
+        return resolve();
+      } catch (e) {
+        console.error(e);
+        res.status(500).end();
+        return resolve();
+      }
+    } else if (type === "add_reply_history") {
+      try {
+        const graphqlReq = {
+          query: ADD_REPLY_HISTORY,
+          variables: {
+            reply_id: old.id,
+            revision: old.revision,
+            old_content: old.content,
+          },
+        };
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
+          },
+          body: JSON.stringify(graphqlReq),
+        });
+
+        const json = await response.json();
+        if (json.errors) {
+          throw new Error(json.errors[0].message);
+        }
 
         res.status(200).end();
         return resolve();
