@@ -339,7 +339,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                               回复了你在帖子{" "}
                               <Link
                                 href="/topics/[topicId]/posts/[postId]"
-                                as={`/topics/${activity.reply.comment.post?.topic_id}/posts/${activity.reply.comment.post?.id}#comment-${activity.reply.comment.id}?reply-${activity.reply.id}`}
+                                as={`/topics/${activity.reply.comment.post?.topic_id}/posts/${activity.reply.comment.post?.id}#comment-${activity.reply.comment.id}?reply=${activity.reply.id}`}
                               >
                                 <a>{activity.reply.comment.post?.title}</a>
                               </Link>{" "}

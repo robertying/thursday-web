@@ -74,9 +74,15 @@ const ADD_POST_HISTORY = `
     $post_id: Int!
     $revision: Int!
     $old_content: String!
+    $old_title: String!
   ) {
     insert_post_history_one(
-      object: { post_id: $post_id, revision: $revision, content: $old_content }
+      object: {
+        post_id: $post_id
+        revision: $revision
+        content: $old_content
+        title: $old_title
+      }
     ) {
       post_id
     }
@@ -277,7 +283,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
         await sendWebPush(reply.comment.author.web_push_subscription, {
           title: "你收到了一条新回复",
           content: `${reply.author.username} 回复了你在帖子 ${reply.comment.post.title} 中的评论`,
-          url: `/topics/${reply.comment.post.topic_id}/posts/${reply.comment.post.id}#comment-${reply.comment.id}?reply-${data.id}`,
+          url: `/topics/${reply.comment.post.topic_id}/posts/${reply.comment.post.id}#comment-${reply.comment.id}?reply=${data.id}`,
         });
 
         res.status(200).end();
@@ -295,6 +301,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
             post_id: old.id,
             revision: old.revision,
             old_content: old.content,
+            old_title: old.title,
           },
         };
         const response = await fetch(url, {
