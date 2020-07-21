@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) =>
       textOverflow: "ellipsis",
       overflow: "hidden",
       whiteSpace: "nowrap",
-      maxWidth: 300,
+      maxWidth: "85%",
     },
     smallAvatar: {
       width: theme.spacing(4),
@@ -49,11 +49,9 @@ const TopicCard: React.FC<GetTopics_category_topics> = ({ name, posts }) => {
                 alignItems="center"
                 spacing={1}
               >
-                <Grid item>
-                  <Typography className={classes.postTitle} variant="body1">
-                    {post.title}
-                  </Typography>
-                </Grid>
+                <Typography className={classes.postTitle} variant="body1">
+                  {post.title}
+                </Typography>
                 <Grid item>
                   <AvatarGroup
                     classes={{ avatar: classes.smallAvatar }}

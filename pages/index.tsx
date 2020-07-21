@@ -106,7 +106,7 @@ const HomePage = () => {
           <Grid container direction="column" alignItems="center" spacing={2}>
             <Grid container item justify="center" spacing={2}>
               {topPostData?.post?.[0] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${topPostData?.post?.[0].topic_id}/posts/${topPostData?.post?.[0].id}`}
@@ -118,7 +118,7 @@ const HomePage = () => {
                 </Grid>
               )}
               {topPostData?.post?.[1] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${topPostData?.post?.[1].topic_id}/posts/${topPostData?.post?.[1].id}`}
@@ -132,7 +132,7 @@ const HomePage = () => {
             </Grid>
             <Grid container item justify="center" spacing={2}>
               {topPostData?.post?.[2] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${topPostData?.post?.[2].topic_id}/posts/${topPostData?.post?.[2].id}`}
@@ -144,7 +144,7 @@ const HomePage = () => {
                 </Grid>
               )}
               {topPostData?.post?.[3] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${topPostData?.post?.[3].topic_id}/posts/${topPostData?.post?.[3].id}`}
@@ -156,7 +156,7 @@ const HomePage = () => {
                 </Grid>
               )}
               {topPostData?.post?.[4] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${topPostData?.post?.[4].topic_id}/posts/${topPostData?.post?.[4].id}`}
@@ -175,7 +175,7 @@ const HomePage = () => {
           <Grid container direction="column" alignItems="center" spacing={2}>
             <Grid container item justify="center" spacing={2}>
               {newestPostData?.post?.[0] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${newestPostData?.post?.[0].topic_id}/posts/${newestPostData?.post?.[0].id}`}
@@ -187,7 +187,7 @@ const HomePage = () => {
                 </Grid>
               )}
               {newestPostData?.post?.[1] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${newestPostData?.post?.[1].topic_id}/posts/${newestPostData?.post?.[1].id}`}
@@ -201,7 +201,7 @@ const HomePage = () => {
             </Grid>
             <Grid container item justify="center" spacing={2}>
               {newestPostData?.post?.[2] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${newestPostData?.post?.[2].topic_id}/posts/${newestPostData?.post?.[2].id}`}
@@ -213,7 +213,7 @@ const HomePage = () => {
                 </Grid>
               )}
               {newestPostData?.post?.[3] && (
-                <Grid item xs>
+                <Grid item xs={12} sm>
                   <Link
                     href="/topics/[topicId]/posts/[postId]"
                     as={`/topics/${newestPostData?.post?.[3].topic_id}/posts/${newestPostData?.post?.[3].id}`}

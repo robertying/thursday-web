@@ -100,7 +100,7 @@ const TopicPage: React.FC = () => {
                 >
                   <Grid container item justify="flex-start" spacing={2}>
                     {category.topics.map((topic) => (
-                      <Grid key={topic.id} item xs={6}>
+                      <Grid key={topic.id} item xs={12} sm={6}>
                         <Link
                           href="/topics/[topicId]"
                           as={`/topics/${topic.id}`}
