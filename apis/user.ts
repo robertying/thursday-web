@@ -55,6 +55,7 @@ export const UPDATE_USER_AVATAR = gql`
       _set: { avatar_url: $avatar_url }
     ) {
       returning {
+        id
         avatar_url
       }
     }
@@ -68,6 +69,7 @@ export const UPDATE_USER_STATUS = gql`
       _set: { status: $status }
     ) {
       returning {
+        id
         status
       }
     }

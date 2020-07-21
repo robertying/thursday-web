@@ -9,11 +9,7 @@ import {
   Grid,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import {
-  Share,
-  Comment as CommentIcon,
-  Reply,
-} from "@material-ui/icons";
+import { Share, Comment as CommentIcon, Reply, Edit } from "@material-ui/icons";
 import dayjs from "dayjs";
 import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
@@ -50,14 +46,15 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-export interface CommentProps {
+export interface CommentProps extends GetPost_post_comments {
   onReact?: (commentId: number, reaction: emoji_reaction_enum) => void;
+  onEdit?: (commentId: number) => void;
   onShare?: (commentId: number) => void;
   onReply?: (commentId: number) => void;
   onReplyButtonClick?: () => void;
 }
 
-const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
+const Comment: React.FC<CommentProps> = ({
   id,
   content,
   author,
@@ -65,6 +62,7 @@ const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
   replies_aggregate,
   reaction_aggregate,
   onReact,
+  onEdit,
   onShare,
   onReply,
   onReplyButtonClick,
@@ -88,7 +86,7 @@ const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
         subheader={author.status ?? ""}
       />
       <CardContent className={classes.content}>
-        <MyEditor defaultValue={deserialize(content)} readonly />
+        <MyEditor value={deserialize(content)} readonly />
         <Typography className={classes.date} variant="caption">
           编辑于 {dayjs(updated_at).fromNow()}
         </Typography>
@@ -120,16 +118,18 @@ const Comment: React.FC<GetPost_post_comments & CommentProps> = ({
             </Grid>
           </div>
           <div className={classes.row}>
+            {onEdit && (
+              <Grid item>
+                <IconButton onClick={() => onEdit?.(id)}>
+                  <Edit />
+                </IconButton>
+              </Grid>
+            )}
             <Grid item>
               <IconButton onClick={() => onReply?.(id)}>
                 <Reply />
               </IconButton>
             </Grid>
-            {/* <Grid item>
-              <IconButton>
-                <Favorite />
-              </IconButton>
-            </Grid> */}
             <Grid item>
               <IconButton onClick={() => onShare?.(id)}>
                 <Share />

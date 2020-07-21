@@ -1,10 +1,17 @@
-import { Card, Typography, CardContent, CardHeader } from "@material-ui/core";
+import {
+  Card,
+  Typography,
+  CardContent,
+  CardHeader,
+  IconButton,
+} from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import dayjs from "dayjs";
 import Avatar from "components/Avatar";
 import { GetReplies_reply } from "apis/types";
 import { deserialize } from "lib/slatejs";
 import MyEditor from "./Editor";
+import { Edit } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -21,11 +28,16 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const ReplyCard: React.FC<GetReplies_reply> = ({
+export interface ReplyProps extends GetReplies_reply {
+  onEdit?: (replyId: number) => void;
+}
+
+export const Reply: React.FC<ReplyProps> = ({
   author,
   content,
   created_at,
   id,
+  onEdit,
 }) => {
   const classes = useStyles();
 
@@ -54,15 +66,22 @@ const ReplyCard: React.FC<GetReplies_reply> = ({
             编辑于 {dayjs(created_at).fromNow()}
           </Typography>
         }
+        action={
+          onEdit && (
+            <IconButton onClick={() => onEdit?.(id)}>
+              <Edit />
+            </IconButton>
+          )
+        }
       />
       <CardContent
         className={classes.smallPadding}
         style={{ paddingBottom: 0 }}
       >
-        <MyEditor defaultValue={deserialize(content)} readonly />
+        <MyEditor value={deserialize(content)} readonly />
       </CardContent>
     </Card>
   );
 };
 
-export default ReplyCard;
+export default Reply;

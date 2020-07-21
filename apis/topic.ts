@@ -19,6 +19,7 @@ export const GET_TOPICS = gql`
             distinct_on: author_id
             order_by: { author_id: asc, updated_at: desc }
           ) {
+            id
             author {
               username
               avatar_url

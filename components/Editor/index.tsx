@@ -28,6 +28,7 @@ import { withLinks, LinkButton, Link } from "./Link";
 import { withNewline } from "./Newline";
 import { withMath, MathButton, Math } from "./Math";
 import { isMobile } from "lib/platform";
+import { getEmptyValue } from "lib/slatejs";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -75,20 +76,31 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-function MyEditor(props: {
+export interface MyEditorProps {
   className?: string;
-  defaultValue?: Node[];
+  value?: Node[];
+  plainTextValue?: string;
   readonly?: boolean;
   onChange?: (value: Node[]) => void;
   onPlainTextChange?: (value: string) => void;
   compact?: boolean;
-}) {
+}
+
+const MyEditor: React.FC<MyEditorProps> = ({
+  className,
+  value,
+  plainTextValue,
+  readonly,
+  onChange,
+  onPlainTextChange,
+  compact,
+}) => {
   const classes = useStyles({
-    readonly: props.readonly,
-    compact: props.compact,
+    readonly,
+    compact,
   });
 
-  const size = props.compact ? "small" : "medium";
+  const size = compact ? "small" : "medium";
 
   const renderElement = useCallback((props) => <Element {...props} />, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
@@ -100,47 +112,34 @@ function MyEditor(props: {
     []
   );
 
-  const [value, setValue] = useState<Node[]>(
-    props.defaultValue ?? [
-      {
-        type: "paragraph",
-        children: [{ text: "" }],
-      },
-    ]
-  );
-
-  const [plainValue, setPlainValue] = useState("");
-
   const [readOnly, setReadOnly] = useState(false);
 
   const isMobilePlatform = useMemo(() => isMobile(), []);
 
-  return isMobilePlatform && !(props.readonly || readOnly) ? (
+  return isMobilePlatform && !(readonly || readOnly) ? (
     <textarea
       className={`MuiInputBase-root ${classes.editable} ${classes.textarea} ${
-        props.className ?? ""
+        className ?? ""
       }`}
       autoFocus
       autoCapitalize="on"
       autoCorrect="on"
       spellCheck
-      value={plainValue}
+      value={plainTextValue ?? ""}
       onChange={(e) => {
-        setPlainValue(e.target.value);
-        props.onPlainTextChange?.(e.target.value);
+        onPlainTextChange?.(e.target.value);
       }}
     />
   ) : (
-    <div className={`${classes.root} ${props.className ?? ""}`}>
+    <div className={`${classes.root} ${className ?? ""}`}>
       <Slate
         editor={editor}
-        value={value}
+        value={value ?? getEmptyValue()}
         onChange={(value) => {
-          setValue(value);
-          props.onChange?.(value);
+          onChange?.(value);
         }}
       >
-        {!props.readonly && (
+        {!readonly && (
           <>
             <div className={classes.toolbar}>
               <MarkButton format="bold" icon={<FormatBold />} size={size} />
@@ -189,7 +188,7 @@ function MyEditor(props: {
         )}
         <Editable
           className={classes.editable}
-          readOnly={props.readonly || readOnly}
+          readOnly={readonly || readOnly}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           spellCheck
@@ -207,7 +206,7 @@ function MyEditor(props: {
       </Slate>
     </div>
   );
-}
+};
 
 const HOTKEYS = {
   "mod+b": "bold",

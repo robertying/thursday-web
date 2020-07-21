@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -25,13 +25,24 @@ import {
   GetTopicById,
   GetTopicByIdVariables,
   GetTopicById_topic_by_pk,
+  GetPost_post,
+  UpdatePost,
+  UpdatePostVariables,
 } from "apis/types";
-import { ADD_POST } from "apis/post";
+import { ADD_POST, UPDATE_POST } from "apis/post";
 import { initializeApollo } from "apis/client";
 import { GET_TOPIC_BY_ID } from "apis/topic";
 import useUserId from "lib/useUserId";
-import { getNodes, serialize, isEmpty } from "lib/slatejs";
+import {
+  getNodes,
+  serialize,
+  isEmpty,
+  deserialize,
+  getPlainText,
+  getEmptyValue,
+} from "lib/slatejs";
 import { isMobile } from "lib/platform";
+import useBeforeReload from "lib/useBeforeReload";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -78,6 +89,10 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
   const classes = useStyles();
 
   const router = useRouter();
+  const post = router.query.post
+    ? (JSON.parse(router.query.post as string) as GetPost_post)
+    : null;
+
   useEffect(() => {
     if (!topic) {
       router.push({
@@ -91,19 +106,34 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
 
   const authorId = useUserId();
 
-  const [title, setTitle] = useState("");
-  const [value, setValue] = useState<Node[]>([]);
-  const [plainValue, setPlainValue] = useState("");
-
-  const [addPost, { loading, error }] = useMutation<AddPost, AddPostVariables>(
-    ADD_POST
+  const [title, setTitle] = useState(post?.title ?? "");
+  const [value, setValue] = useState<Node[]>(
+    post?.content ? deserialize(post?.content) : getEmptyValue()
+  );
+  const [plainValue, setPlainValue] = useState(
+    post?.content ? getPlainText(deserialize(post?.content)) : ""
   );
 
+  const [
+    addPost,
+    { loading: addPostLoading, error: addPostError },
+  ] = useMutation<AddPost, AddPostVariables>(ADD_POST);
+  const [
+    updatePost,
+    { loading: updatePostLoading, error: updatePostError },
+  ] = useMutation<UpdatePost, UpdatePostVariables>(UPDATE_POST);
+
   useEffect(() => {
-    if (error) {
+    if (addPostError) {
       setMessage("帖子发布失败");
     }
-  }, [error]);
+  }, [addPostError]);
+
+  useEffect(() => {
+    if (updatePostError) {
+      setMessage("帖子更新失败");
+    }
+  }, [updatePostError]);
 
   const handlePost = async () => {
     if (!title) {
@@ -126,45 +156,50 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
       v = serialize(value);
     }
 
-    const post = await addPost({
-      variables: {
-        author_id: authorId!,
-        topic_id: topic!.id,
-        title,
-        content: v,
-      },
-    });
-
-    if (post && !error) {
-      setMessage("发表成功！");
+    if (post) {
+      const p = await updatePost({
+        variables: {
+          post_id: post.id,
+          title,
+          content: v,
+        },
+      });
+      setMessage("编辑成功！");
       setTimeout(() => {
-        window.removeEventListener("beforeunload", listener);
         router.push(
           "/topics/[topicId]/posts/[postId]",
-          `/topics/${topic!.id}/posts/${post.data!.insert_post_one?.id}`
+          `/topics/${topic!.id}/posts/${p.data!.update_post_by_pk?.id}`
+        );
+      }, 1000);
+    } else {
+      const p = await addPost({
+        variables: {
+          author_id: authorId!,
+          topic_id: topic!.id,
+          title,
+          content: v,
+        },
+      });
+      setMessage("发表成功！");
+      setTimeout(() => {
+        router.push(
+          "/topics/[topicId]/posts/[postId]",
+          `/topics/${topic!.id}/posts/${p.data!.insert_post_one?.id}`
         );
       }, 1000);
     }
   };
 
-  const listener = useCallback((e: BeforeUnloadEvent) => {
-    e.preventDefault();
-    e.returnValue = "";
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("beforeunload", listener);
-    return () => {
-      window.removeEventListener("beforeunload", listener);
-    };
-  }, []);
-
   const [message, setMessage] = useState("");
+
+  useBeforeReload(true);
 
   return (
     <div className={classes.root}>
       <NextSeo title={`#${topic!.name} - 编辑`} />
-      {loading && <LinearProgress className={classes.loading} />}
+      {(addPostLoading || updatePostLoading) && (
+        <LinearProgress className={classes.loading} />
+      )}
       <AppBar className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
           <Link href="/topics/[topicId]" as={`/topics/${topic?.id}`}>
@@ -177,7 +212,11 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
           <Typography variant="h6" style={{ flex: 1 }}>
             #{topic!.name}
           </Typography>
-          <Button color="primary" onClick={handlePost}>
+          <Button
+            color="primary"
+            onClick={handlePost}
+            disabled={addPostLoading || updatePostLoading}
+          >
             发布
           </Button>
         </Toolbar>
@@ -191,6 +230,8 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
       <Divider />
       <Editor
         className={classes.editor}
+        value={value}
+        plainTextValue={plainValue}
         onChange={setValue}
         onPlainTextChange={setPlainValue}
       />

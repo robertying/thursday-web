@@ -158,6 +158,32 @@ export interface AddCommentVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: UpdateComment
+// ====================================================
+
+export interface UpdateComment_update_comment_by_pk {
+  __typename: "comment";
+  id: number;
+}
+
+export interface UpdateComment {
+  /**
+   * update single row of the table: "comment"
+   */
+  update_comment_by_pk: UpdateComment_update_comment_by_pk | null;
+}
+
+export interface UpdateCommentVariables {
+  comment_id: number;
+  content: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: GetTopPosts
 // ====================================================
 
@@ -327,6 +353,7 @@ export interface GetNewestPosts {
 
 export interface GetPost_post_topic {
   __typename: "topic";
+  id: number;
   name: string;
 }
 
@@ -466,11 +493,39 @@ export interface AddPostVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: UpdatePost
+// ====================================================
+
+export interface UpdatePost_update_post_by_pk {
+  __typename: "post";
+  id: number;
+}
+
+export interface UpdatePost {
+  /**
+   * update single row of the table: "post"
+   */
+  update_post_by_pk: UpdatePost_update_post_by_pk | null;
+}
+
+export interface UpdatePostVariables {
+  post_id: number;
+  title: string;
+  content: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: GetSelfReactions
 // ====================================================
 
 export interface GetSelfReactions_reaction {
   __typename: "reaction";
+  id: string;
   reaction: emoji_reaction_enum;
 }
 
@@ -610,6 +665,32 @@ export interface GetRepliesVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: UpdateReply
+// ====================================================
+
+export interface UpdateReply_update_reply_by_pk {
+  __typename: "reply";
+  id: number;
+}
+
+export interface UpdateReply {
+  /**
+   * update single row of the table: "reply"
+   */
+  update_reply_by_pk: UpdateReply_update_reply_by_pk | null;
+}
+
+export interface UpdateReplyVariables {
+  reply_id: number;
+  content: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: GetTopicPosts
 // ====================================================
 
@@ -694,6 +775,7 @@ export interface GetTopics_category_topics_posts_comments_author {
 
 export interface GetTopics_category_topics_posts_comments {
   __typename: "comment";
+  id: number;
   /**
    * An object relationship
    */
@@ -908,6 +990,7 @@ export interface GetUserProfileVariables {
 
 export interface UpdateUserAvatar_update_user_returning {
   __typename: "user";
+  id: uuid;
   avatar_url: string | null;
 }
 
@@ -942,6 +1025,7 @@ export interface UpdateUserAvatarVariables {
 
 export interface UpdateUserStatus_update_user_returning {
   __typename: "user";
+  id: uuid;
   status: string | null;
 }
 

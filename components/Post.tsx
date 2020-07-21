@@ -8,7 +8,7 @@ import {
   Grid,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { Share } from "@material-ui/icons";
+import { Share, Edit } from "@material-ui/icons";
 import dayjs from "dayjs";
 import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
@@ -36,12 +36,13 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-export interface PostProps {
+export interface PostProps extends GetPost_post {
   onReact?: (postId: number, reaction: emoji_reaction_enum) => void;
+  onEdit?: (postId: number) => void;
   onShare?: (postId: number) => void;
 }
 
-const Post: React.FC<GetPost_post & PostProps> = ({
+const Post: React.FC<PostProps> = ({
   id,
   title,
   content,
@@ -49,6 +50,7 @@ const Post: React.FC<GetPost_post & PostProps> = ({
   updated_at,
   reaction_aggregate,
   onReact,
+  onEdit,
   onShare,
 }) => {
   const classes = useStyles();
@@ -73,7 +75,7 @@ const Post: React.FC<GetPost_post & PostProps> = ({
         <Typography gutterBottom variant="h6">
           {title}
         </Typography>
-        <MyEditor defaultValue={deserialize(content)} readonly />
+        <MyEditor value={deserialize(content)} readonly />
         <Typography
           className={classes.date}
           variant="caption"
@@ -96,9 +98,11 @@ const Post: React.FC<GetPost_post & PostProps> = ({
             />
           </Grid>
           <Grid item>
-            {/* <IconButton>
-              <Favorite />
-            </IconButton> */}
+            {onEdit && (
+              <IconButton onClick={() => onEdit?.(id)}>
+                <Edit />
+              </IconButton>
+            )}
             <IconButton onClick={() => onShare?.(id)}>
               <Share />
             </IconButton>

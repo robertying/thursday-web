@@ -30,3 +30,14 @@ export const GET_REPLIES = gql`
     }
   }
 `;
+
+export const UPDATE_REPLY = gql`
+  mutation UpdateReply($reply_id: Int!, $content: String!) {
+    update_reply_by_pk(
+      pk_columns: { id: $reply_id }
+      _set: { content: $content }
+    ) {
+      id
+    }
+  }
+`;

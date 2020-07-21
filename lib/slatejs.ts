@@ -23,7 +23,9 @@ export const getNodes = (value: string) => {
 
 export const serialize = (value: Node[]) => {
   const val = [...value];
-  val.pop();
+  if (val.length > 1) {
+    val.pop();
+  }
   return JSON.stringify(val);
 };
 
@@ -32,5 +34,12 @@ export const deserialize = (value: string) => {
 };
 
 export const isEmpty = (value: Node[]) => {
-  return value.length === 0 || (value.length === 1 && !Node.string(value[0]));
+  return value.length === 0 || value.every((n) => !Node.string(n));
 };
+
+export const getEmptyValue = () => [
+  {
+    type: "paragraph",
+    children: [{ text: "" }],
+  },
+];

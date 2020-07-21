@@ -9,3 +9,14 @@ export const ADD_COMMENT = gql`
     }
   }
 `;
+
+export const UPDATE_COMMENT = gql`
+  mutation UpdateComment($comment_id: Int!, $content: String!) {
+    update_comment_by_pk(
+      pk_columns: { id: $comment_id }
+      _set: { content: $content }
+    ) {
+      id
+    }
+  }
+`;

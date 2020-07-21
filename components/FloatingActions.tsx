@@ -7,7 +7,7 @@ import {
   Grid,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-import { Edit, KeyboardArrowUp, AddComment } from "@material-ui/icons";
+import { KeyboardArrowUp, AddComment, Add } from "@material-ui/icons";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -82,7 +82,7 @@ const FloatingActions: React.FC<FloatingActionsProps> = ({
             <Link href="/topics/[topicId]/edit" as={`/topics/${topicId}/edit`}>
               <a>
                 <Fab color="primary" size="small">
-                  <Edit />
+                  <Add />
                 </Fab>
               </a>
             </Link>

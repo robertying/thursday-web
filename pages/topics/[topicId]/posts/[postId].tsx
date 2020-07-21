@@ -14,6 +14,7 @@ import {
   ListItemAvatar,
   ListItemText,
   CircularProgress,
+  LinearProgress,
 } from "@material-ui/core";
 import { makeStyles, createStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "@material-ui/icons";
@@ -26,8 +27,9 @@ import Post from "components/Post";
 import Comment from "components/Comment";
 import Layout from "components/Layout";
 import FloatingActions from "components/FloatingActions";
-import ReplyCard from "components/ReplyCard";
+import Reply from "components/Reply";
 import Editor from "components/Editor";
+import Avatar from "components/Avatar";
 import {
   GetPost,
   GetPostVariables,
@@ -42,18 +44,29 @@ import {
   AddReplyVariables,
   GetReplies,
   GetRepliesVariables,
+  UpdateComment,
+  UpdateCommentVariables,
+  UpdateReply,
+  UpdateReplyVariables,
 } from "apis/types";
 import { initializeApollo } from "apis/client";
 import { GET_POST } from "apis/post";
 import { ADD_REACTION, DELETE_REACTION } from "apis/reaction";
 import { AddReaction, AddReactionVariables } from "apis/types";
-import useUserId from "lib/useUserId";
-import { ADD_COMMENT } from "apis/comment";
-import { serialize, getNodes, isEmpty } from "lib/slatejs";
+import { ADD_COMMENT, UPDATE_COMMENT } from "apis/comment";
 import { GET_USER } from "apis/user";
+import { ADD_REPLY, GET_REPLIES, UPDATE_REPLY } from "apis/reply";
+import {
+  serialize,
+  getNodes,
+  isEmpty,
+  deserialize,
+  getPlainText,
+  getEmptyValue,
+} from "lib/slatejs";
+import useUserId from "lib/useUserId";
 import { isMobile } from "lib/platform";
-import Avatar from "components/Avatar";
-import { ADD_REPLY, GET_REPLIES } from "apis/reply";
+import useBeforeReload from "lib/useBeforeReload";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -79,6 +92,13 @@ const useStyles = makeStyles((theme) =>
     dialogContentLoading: {
       textAlign: "center",
     },
+    loading: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 1199,
+    },
   })
 );
 
@@ -91,7 +111,6 @@ const PostPage: React.FC = () => {
   const { postId, topicId } = router.query;
 
   const userId = useUserId();
-
   const { data: userData } = useQuery<GetUser, GetUserVariables>(GET_USER, {
     variables: {
       id: userId!,
@@ -106,6 +125,9 @@ const PostPage: React.FC = () => {
   });
   const post = data?.post?.[0];
 
+  /**
+   * reaction
+   */
   const [addReaction] = useMutation<AddReaction, AddReactionVariables>(
     ADD_REACTION
   );
@@ -137,7 +159,7 @@ const PostPage: React.FC = () => {
       }
     }
 
-    refetch();
+    await refetch();
   };
 
   const handleReactComment = async (
@@ -167,21 +189,12 @@ const PostPage: React.FC = () => {
       }
     }
 
-    refetch();
+    await refetch();
   };
 
-  const [replyModalVisible, setReplyModalVisible] = useState(false);
-
-  const handleReplyModalClose = () => {
-    setReplyModalVisible(false);
-    setCommentId(null);
-  };
-
-  const [commentEditDialogOpen, setCommentEditDialogOpen] = useState(false);
-  const [commentValue, setCommentValue] = useState<Node[]>([]);
-  const [commentPlainValue, setCommentPlainValue] = useState("");
-  const [commentId, setCommentId] = useState<number | null>(null);
-
+  /**
+   * comment
+   */
   const [
     addComment,
     {
@@ -191,14 +204,18 @@ const PostPage: React.FC = () => {
     },
   ] = useMutation<AddComment, AddCommentVariables>(ADD_COMMENT);
   const [
-    addReply,
-    { loading: addReplyLoading, error: addReplyError, data: addReplyData },
-  ] = useMutation<AddReply, AddReplyVariables>(ADD_REPLY);
+    updateComment,
+    {
+      loading: updateCommentLoading,
+      error: updateCommentError,
+      data: updateCommentData,
+    },
+  ] = useMutation<UpdateComment, UpdateCommentVariables>(UPDATE_COMMENT);
 
   useEffect(() => {
     if (addCommentData) {
       (async () => {
-        setCommentEditDialogOpen(false);
+        handleEditClose();
         await refetch();
         router.push(
           `${router.asPath.split("#")[0]}#comment-${
@@ -210,9 +227,77 @@ const PostPage: React.FC = () => {
   }, [addCommentData]);
 
   useEffect(() => {
+    if (updateCommentData) {
+      (async () => {
+        handleEditClose();
+        await refetch();
+        router.push(
+          `${router.asPath.split("#")[0]}#comment-${
+            updateCommentData.update_comment_by_pk?.id
+          }`
+        );
+      })();
+    }
+  }, [updateCommentData]);
+
+  useEffect(() => {
+    if (addCommentError) {
+      setMessage("评论发表失败");
+    }
+  }, [addCommentError]);
+
+  useEffect(() => {
+    if (updateCommentError) {
+      setMessage("评论编辑失败");
+    }
+  }, [updateCommentError]);
+
+  /**
+   * reply
+   */
+  const [replyModalVisible, setReplyModalVisible] = useState(false);
+  const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
+  const [
+    getReplies,
+    { data: replyData, loading: replyLoading, error: replyError },
+  ] = useLazyQuery<GetReplies, GetRepliesVariables>(GET_REPLIES, {
+    fetchPolicy: "network-only",
+  });
+  const [
+    addReply,
+    { loading: addReplyLoading, error: addReplyError, data: addReplyData },
+  ] = useMutation<AddReply, AddReplyVariables>(ADD_REPLY);
+  const [
+    updateReply,
+    {
+      loading: updateReplyLoading,
+      error: updateReplyError,
+      data: updateReplyData,
+    },
+  ] = useMutation<UpdateReply, UpdateReplyVariables>(UPDATE_REPLY);
+
+  const handleReplyModalOpen = () => {
+    setReplyModalVisible(true);
+  };
+  const handleReplyModalClose = () => {
+    setReplyModalVisible(false);
+    setReplyToCommentId(null);
+  };
+
+  useEffect(() => {
+    if (replyModalVisible && replyToCommentId) {
+      getReplies({
+        variables: {
+          comment_id: replyToCommentId,
+        },
+      });
+    }
+  }, [replyModalVisible, replyToCommentId]);
+
+  useEffect(() => {
     if (addReplyData) {
       (async () => {
-        setCommentEditDialogOpen(false);
+        handleEditClose();
         await refetch();
         setReplyModalVisible(true);
         router.push(
@@ -225,47 +310,94 @@ const PostPage: React.FC = () => {
   }, [addReplyData]);
 
   useEffect(() => {
-    if (addCommentError) {
-      setMessage("评论发表失败");
+    if (updateReplyData) {
+      (async () => {
+        handleEditClose();
+        await refetch();
+        setReplyModalVisible(true);
+        router.push(
+          `${router.asPath.split("#")[0]}#reply-${
+            updateReplyData.update_reply_by_pk?.id
+          }`
+        );
+      })();
     }
-  }, [addCommentError]);
+  }, [updateReplyData]);
 
   useEffect(() => {
     if (addReplyError) {
-      setMessage("评论发表失败");
+      setMessage("回复发表失败");
     }
   }, [addReplyError]);
 
-  const handleCommentEditClick = () => {
-    setCommentEditDialogOpen(true);
+  useEffect(() => {
+    if (updateReplyError) {
+      setMessage("回复编辑失败");
+    }
+  }, [updateReplyError]);
+
+  useEffect(() => {
+    if (replyError) {
+      setMessage("回复加载失败");
+    }
+  }, [replyError]);
+
+  /**
+   * edit
+   */
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
+  const [value, setValue] = useState<Node[]>(getEmptyValue());
+  const [plainValue, setPlainValue] = useState("");
+
+  const handleEditClick = () => {
+    setEditDialogOpen(true);
   };
 
-  const handleCommentEditClose = () => {
-    setCommentEditDialogOpen(false);
-    setCommentId(null);
+  const handleEditClose = () => {
+    setEditDialogOpen(false);
+    setEditingCommentId(null);
+    setEditingReplyId(null);
+    setValue(getEmptyValue());
+    setPlainValue("");
   };
 
-  const handleCommentEdit = async () => {
+  const handleEdit = async () => {
     let v: string | null = null;
     if (isMobile()) {
-      if (!commentPlainValue) {
+      if (!plainValue) {
         setMessage("请输入内容");
         return;
       }
-      v = serialize(getNodes(commentPlainValue));
+      v = serialize(getNodes(plainValue));
     } else {
-      if (isEmpty(commentValue)) {
+      if (isEmpty(value)) {
         setMessage("请输入内容");
         return;
       }
-      v = serialize(commentValue);
+      v = serialize(value);
     }
 
-    if (commentId) {
+    if (editingReplyId) {
+      await updateReply({
+        variables: {
+          reply_id: editingReplyId,
+          content: v,
+        },
+      });
+    } else if (replyToCommentId) {
       await addReply({
         variables: {
           author_id: userId!,
-          comment_id: commentId,
+          comment_id: replyToCommentId,
+          content: v,
+        },
+      });
+    } else if (editingCommentId) {
+      await updateComment({
+        variables: {
+          comment_id: editingCommentId,
           content: v,
         },
       });
@@ -280,29 +412,19 @@ const PostPage: React.FC = () => {
     }
   };
 
-  const [
-    getReplies,
-    { data: replyData, loading: replyLoading, error: replyError },
-  ] = useLazyQuery<GetReplies, GetRepliesVariables>(GET_REPLIES, {
-    fetchPolicy: "network-only",
-  });
+  const handlePostEdit = () => {
+    router.push(
+      {
+        pathname: "/topics/[topicId]/edit",
+        query: { post: JSON.stringify(post) },
+      },
+      `/topics/${topicId}/edit`
+    );
+  };
 
-  useEffect(() => {
-    if (replyModalVisible && commentId) {
-      getReplies({
-        variables: {
-          comment_id: commentId,
-        },
-      });
-    }
-  }, [replyModalVisible, commentId]);
-
-  useEffect(() => {
-    if (replyError) {
-      setMessage("回复加载失败");
-    }
-  }, [replyError]);
-
+  /**
+   * share
+   */
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [sharedUrl, setSharedUrl] = useState("");
 
@@ -327,7 +449,12 @@ const PostPage: React.FC = () => {
     handleShareDialogClose();
   };
 
+  /**
+   * snackbar
+   */
   const [message, setMessage] = useState("");
+
+  useBeforeReload(editDialogOpen);
 
   return (
     <Layout
@@ -339,6 +466,10 @@ const PostPage: React.FC = () => {
       userAvatarUrl={userData?.user_by_pk?.avatar_url}
     >
       <NextSeo title={`#${post?.topic.name} - ${post!.title}`} />
+      {(addCommentLoading ||
+        addReplyLoading ||
+        updateCommentLoading ||
+        updateReplyLoading) && <LinearProgress className={classes.loading} />}
       <Grid
         className={classes.root}
         container
@@ -351,6 +482,11 @@ const PostPage: React.FC = () => {
           <Post
             {...post!}
             onReact={handleReactPost}
+            onEdit={
+              post?.author.username === userData?.user_by_pk?.username
+                ? handlePostEdit
+                : undefined
+            }
             onShare={(id) => handleShareDialogOpen("post", id)}
           />
         </Grid>
@@ -359,14 +495,24 @@ const PostPage: React.FC = () => {
             <Comment
               {...comment}
               onReact={handleReactComment}
+              onEdit={
+                comment.author.username === userData?.user_by_pk?.username
+                  ? () => {
+                      setValue(deserialize(comment.content));
+                      setPlainValue(getPlainText(deserialize(comment.content)));
+                      setEditingCommentId(comment.id);
+                      handleEditClick();
+                    }
+                  : undefined
+              }
               onShare={(id) => handleShareDialogOpen("comment", id)}
               onReplyButtonClick={() => {
-                setCommentId(comment.id);
-                setReplyModalVisible(true);
+                setReplyToCommentId(comment.id);
+                handleReplyModalOpen();
               }}
-              onReply={(id) => {
-                setCommentId(id);
-                handleCommentEditClick();
+              onReply={() => {
+                setReplyToCommentId(comment.id);
+                handleEditClick();
               }}
             />
           </Grid>
@@ -386,28 +532,55 @@ const PostPage: React.FC = () => {
             </div>
           )}
           {replyData?.reply.map((reply) => (
-            <ReplyCard key={reply.id} {...reply} />
+            <Reply
+              key={reply.id}
+              {...reply}
+              onEdit={
+                reply.author.username === userData?.user_by_pk?.username
+                  ? () => {
+                      setValue(deserialize(reply.content));
+                      setPlainValue(getPlainText(deserialize(reply.content)));
+                      setEditingReplyId(reply.id);
+                      setReplyModalVisible(false);
+                      handleEditClick();
+                    }
+                  : undefined
+              }
+            />
           ))}
         </DialogContent>
       </Dialog>
-      <FloatingActions comment onCommentClick={handleCommentEditClick} />
+      <FloatingActions comment onCommentClick={handleEditClick} />
       <Dialog
-        open={commentEditDialogOpen}
-        onClose={handleCommentEditClose}
+        open={editDialogOpen}
+        onClose={handleEditClose}
         disableBackdropClick
         disableEscapeKeyDown
         fullScreen={fullScreen}
       >
-        <DialogTitle>{commentId ? "添加回复" : "添加评论"}</DialogTitle>
+        <DialogTitle>
+          {editingCommentId
+            ? "编辑评论"
+            : editingReplyId
+            ? "编辑回复"
+            : replyToCommentId
+            ? "添加回复"
+            : "添加评论"}
+        </DialogTitle>
         {fullScreen && (
           <DialogActions>
-            <Button onClick={handleCommentEditClose} color="primary">
+            <Button onClick={handleEditClose} color="primary">
               取消
             </Button>
             <Button
-              onClick={handleCommentEdit}
+              onClick={handleEdit}
               color="primary"
-              disabled={addCommentLoading || addReplyLoading}
+              disabled={
+                addCommentLoading ||
+                addReplyLoading ||
+                updateCommentLoading ||
+                updateReplyLoading
+              }
             >
               发布
             </Button>
@@ -416,19 +589,26 @@ const PostPage: React.FC = () => {
         <DialogContent classes={{ root: classes.dialogContent }}>
           <Editor
             compact
-            onChange={setCommentValue}
-            onPlainTextChange={setCommentPlainValue}
+            value={value}
+            plainTextValue={plainValue}
+            onChange={setValue}
+            onPlainTextChange={setPlainValue}
           />
         </DialogContent>
         {!fullScreen && (
           <DialogActions>
-            <Button onClick={handleCommentEditClose} color="primary">
+            <Button onClick={handleEditClose} color="primary">
               取消
             </Button>
             <Button
-              onClick={handleCommentEdit}
+              onClick={handleEdit}
               color="primary"
-              disabled={addCommentLoading || addReplyLoading}
+              disabled={
+                addCommentLoading ||
+                addReplyLoading ||
+                updateCommentLoading ||
+                updateReplyLoading
+              }
             >
               发布
             </Button>

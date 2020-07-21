@@ -5,6 +5,7 @@ export const GET_POST = gql`
     post(where: { id: { _eq: $id } }) {
       id
       topic {
+        id
         name
       }
       title
@@ -68,6 +69,17 @@ export const ADD_POST = gql`
         content: $content
         topic_id: $topic_id
       }
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_POST = gql`
+  mutation UpdatePost($post_id: Int!, $title: String!, $content: String!) {
+    update_post_by_pk(
+      pk_columns: { id: $post_id }
+      _set: { title: $title, content: $content }
     ) {
       id
     }

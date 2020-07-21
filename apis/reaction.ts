@@ -5,6 +5,7 @@ export const GET_SELF_REACTIONS = gql`
     reaction(
       where: { post_id: { _eq: $post_id }, user_id: { _eq: $user_id } }
     ) {
+      id
       reaction
     }
   }
