@@ -68,8 +68,13 @@ const useStyles = makeStyles((theme) =>
       paddingRight: theme.spacing(3),
       fontSize: 18,
     },
+    license: {
+      margin: theme.spacing(2),
+      paddingLeft: theme.spacing(3),
+      paddingRight: theme.spacing(3),
+    },
     editor: {
-      height: "calc(100vh - 64px - 72px - 1px)",
+      height: "calc(100vh - 64px - 72px - 48px)",
     },
     loading: {
       position: "fixed",
@@ -221,6 +226,18 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
           </Button>
         </Toolbar>
       </AppBar>
+      <Typography variant="caption" className={classes.license}>
+        任何人对你发布内容的使用需要依据{" "}
+        <a
+          href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          CC BY-NC-SA 4.0
+        </a>{" "}
+        知识共享许可协议进行；你也可以单独声明其他类型的许可协议。
+      </Typography>
+      <Divider />
       <InputBase
         className={classes.input}
         placeholder="标题"

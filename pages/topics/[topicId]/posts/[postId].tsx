@@ -15,6 +15,7 @@ import {
   ListItemText,
   CircularProgress,
   LinearProgress,
+  DialogContentText,
 } from "@material-ui/core";
 import { makeStyles, createStyles, useTheme } from "@material-ui/core/styles";
 import { Link } from "@material-ui/icons";
@@ -587,6 +588,17 @@ const PostPage: React.FC = () => {
           </DialogActions>
         )}
         <DialogContent classes={{ root: classes.dialogContent }}>
+          <DialogContentText variant="caption">
+            任何人对你发布内容的使用需要依据{" "}
+            <a
+              href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              CC BY-NC-SA 4.0
+            </a>{" "}
+            知识共享许可协议进行；你也可以单独声明其他类型的许可协议。
+          </DialogContentText>
           <Editor
             compact
             value={value}
