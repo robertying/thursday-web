@@ -31,8 +31,18 @@ const Layout: React.FC<LayoutProps> = ({ children, ...restProps }) => {
         direction="row"
         justify="center"
       >
-        <Grid item xs>
-          <Typography variant="caption">© 2020 Thursday</Typography>
+        <Grid container item xs direction="column">
+          <Typography variant="caption">
+            用户生成内容的使用依据{" "}
+            <a
+              href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              CC BY-NC-SA 4.0
+            </a>{" "}
+            知识共享许可协议进行。
+          </Typography>
         </Grid>
       </Grid>
       <div className={classes.toolbar} />
