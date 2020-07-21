@@ -55,7 +55,7 @@ export const UPDATE_USER_AVATAR = gql`
       _set: { avatar_url: $avatar_url }
     ) {
       returning {
-        id
+        username
         avatar_url
       }
     }
@@ -69,7 +69,7 @@ export const UPDATE_USER_STATUS = gql`
       _set: { status: $status }
     ) {
       returning {
-        id
+        username
         status
       }
     }
@@ -85,7 +85,7 @@ export const UPDATE_PUSH_SUBSCRIPTION = gql`
       pk_columns: { id: $user_id }
       _set: { web_push_subscription: $web_push_subscription }
     ) {
-      id
+      username
       web_push_enabled
     }
   }

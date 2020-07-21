@@ -990,7 +990,7 @@ export interface GetUserProfileVariables {
 
 export interface UpdateUserAvatar_update_user_returning {
   __typename: "user";
-  id: uuid;
+  username: string;
   avatar_url: string | null;
 }
 
@@ -1025,7 +1025,7 @@ export interface UpdateUserAvatarVariables {
 
 export interface UpdateUserStatus_update_user_returning {
   __typename: "user";
-  id: uuid;
+  username: string;
   status: string | null;
 }
 
@@ -1060,7 +1060,7 @@ export interface UpdateUserStatusVariables {
 
 export interface UpdatePushSubscription_update_user_by_pk {
   __typename: "user";
-  id: uuid;
+  username: string;
   /**
    * A computed field, executes function "user_web_push_enabled"
    */
