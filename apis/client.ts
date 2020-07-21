@@ -52,7 +52,13 @@ function createApolloClient(ctx?: GetServerSidePropsContext<ParsedUrlQuery>) {
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
     link,
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        user: {
+          keyFields: ["username"],
+        },
+      },
+    }),
   });
 }
 
