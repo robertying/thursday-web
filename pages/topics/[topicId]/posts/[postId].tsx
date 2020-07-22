@@ -360,6 +360,7 @@ const PostPage: React.FC = () => {
     setEditDialogOpen(false);
     setEditingCommentId(null);
     setEditingReplyId(null);
+    setReplyToCommentId(null);
     setValue(getEmptyValue());
     setPlainValue("");
   };
