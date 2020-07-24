@@ -1,6 +1,5 @@
 import "styles/global.css";
 import "katex/dist/katex.min.css";
-import { useEffect } from "react";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { DefaultSeo } from "next-seo";
@@ -18,16 +17,16 @@ import useUserSession from "lib/useUserSession";
 dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
+if (typeof window !== "undefined") {
+  (window as any).recaptchaOptions = {
+    useRecaptchaNet: true,
+  };
+}
+
 export default function App({ Component, pageProps }: AppProps) {
   const apolloClient = useApollo(pageProps.initialApolloState);
 
   useUserSession(true);
-
-  useEffect(() => {
-    (window as any).recaptchaOptions = {
-      useRecaptchaNet: true,
-    };
-  }, []);
 
   return (
     <ApolloProvider client={apolloClient}>
