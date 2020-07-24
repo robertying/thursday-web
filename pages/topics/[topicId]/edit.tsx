@@ -30,7 +30,7 @@ import {
   UpdatePost,
   UpdatePostVariables,
 } from "apis/types";
-import { ADD_POST, getTagInput, UPDATE_POST } from "apis/post";
+import { ADD_POST, getPostTagInput, getTagInput, UPDATE_POST } from "apis/post";
 import { initializeApollo } from "apis/client";
 import { GET_TOPIC_BY_ID } from "apis/topic";
 import useUserId from "lib/useUserId";
@@ -101,7 +101,10 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
   const post = router.query.post
     ? (JSON.parse(router.query.post as string) as GetPost_post)
     : null;
-  const defaultTags = (router.query.defaultTags ?? []) as string[];
+  const { tag } = router.query;
+  const defaultTags =
+    post?.post_tags.map((t) => t.tag.name) ??
+    (tag ? (Array.isArray(tag) ? tag : [tag]) : []);
 
   useEffect(() => {
     if (!topic) {
@@ -172,6 +175,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
           post_id: post.id,
           title,
           content: v,
+          tags: tags.map((tag) => getPostTagInput(post.id, tag)),
         },
       });
       setMessage("编辑成功！");
@@ -277,7 +281,6 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
         placeholder="添加标签"
         blurBehavior="ignore"
         disableUnderline
-        fullWidth
       />
       <Divider />
       <Editor

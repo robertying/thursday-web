@@ -357,6 +357,20 @@ export interface GetPost_post_topic {
   name: string;
 }
 
+export interface GetPost_post_post_tags_tag {
+  __typename: "tag";
+  name: string;
+  id: uuid;
+}
+
+export interface GetPost_post_post_tags {
+  __typename: "post_tag";
+  /**
+   * An object relationship
+   */
+  tag: GetPost_post_post_tags_tag;
+}
+
 export interface GetPost_post_reaction_aggregate {
   __typename: "post_reaction";
   confused_face: bigint | null;
@@ -434,6 +448,10 @@ export interface GetPost_post {
   title: string;
   content: string;
   /**
+   * An array relationship
+   */
+  post_tags: GetPost_post_post_tags[];
+  /**
    * An object relationship
    */
   reaction_aggregate: GetPost_post_reaction_aggregate | null;
@@ -502,17 +520,42 @@ export interface UpdatePost_update_post_by_pk {
   id: number;
 }
 
+export interface UpdatePost_delete_post_tag {
+  __typename: "post_tag_mutation_response";
+  /**
+   * number of affected rows by the mutation
+   */
+  affected_rows: number;
+}
+
+export interface UpdatePost_insert_post_tag {
+  __typename: "post_tag_mutation_response";
+  /**
+   * number of affected rows by the mutation
+   */
+  affected_rows: number;
+}
+
 export interface UpdatePost {
   /**
    * update single row of the table: "post"
    */
   update_post_by_pk: UpdatePost_update_post_by_pk | null;
+  /**
+   * delete data from the table: "post_tag"
+   */
+  delete_post_tag: UpdatePost_delete_post_tag | null;
+  /**
+   * insert data into the table: "post_tag"
+   */
+  insert_post_tag: UpdatePost_insert_post_tag | null;
 }
 
 export interface UpdatePostVariables {
   post_id: number;
   title: string;
   content: string;
+  tags: post_tag_insert_input[];
 }
 
 /* tslint:disable */
