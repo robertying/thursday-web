@@ -178,6 +178,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               alignItems="center"
               justify="flex-start"
               spacing={1}
+              wrap="nowrap"
             >
               {backHref && (
                 <Grid item>
