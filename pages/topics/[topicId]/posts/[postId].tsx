@@ -66,7 +66,7 @@ import {
   getEmptyValue,
 } from "lib/slatejs";
 import useUserId from "lib/useUserId";
-import { isMobile } from "lib/platform";
+import { isDesktopSafari, isMobile } from "lib/platform";
 import useBeforeReload from "lib/useBeforeReload";
 
 const useStyles = makeStyles((theme) =>
@@ -367,7 +367,7 @@ const PostPage: React.FC = () => {
 
   const handleEdit = async () => {
     let v: string | null = null;
-    if (isMobile()) {
+    if (isMobile() || isDesktopSafari()) {
       if (!plainValue) {
         setMessage("请输入内容");
         return;

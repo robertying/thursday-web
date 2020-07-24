@@ -42,7 +42,7 @@ import {
   getPlainText,
   getEmptyValue,
 } from "lib/slatejs";
-import { isMobile } from "lib/platform";
+import { isDesktopSafari, isMobile } from "lib/platform";
 import useBeforeReload from "lib/useBeforeReload";
 
 const useStyles = makeStyles((theme) =>
@@ -155,7 +155,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
     }
 
     let v: string | null = null;
-    if (isMobile()) {
+    if (isMobile() || isDesktopSafari()) {
       if (!plainValue) {
         setMessage("请输入内容");
         return;

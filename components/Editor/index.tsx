@@ -27,7 +27,7 @@ import { withImages, ImageButton, Image } from "./Image";
 import { withLinks, LinkButton, Link } from "./Link";
 import { withNewline } from "./Newline";
 import { withMath, MathButton, Math } from "./Math";
-import { isMobile } from "lib/platform";
+import { isDesktopSafari, isMobile } from "lib/platform";
 import { getEmptyValue } from "lib/slatejs";
 
 const useStyles = makeStyles((theme) =>
@@ -114,7 +114,7 @@ const MyEditor: React.FC<MyEditorProps> = ({
 
   const [readOnly, setReadOnly] = useState(false);
 
-  const isMobilePlatform = useMemo(() => isMobile(), []);
+  const isMobilePlatform = useMemo(() => isMobile() || isDesktopSafari(), []);
 
   return isMobilePlatform && !(readonly || readOnly) ? (
     <textarea

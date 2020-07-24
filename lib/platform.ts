@@ -12,3 +12,7 @@ export const isMobile = () => {
       /ipad|iphone|ipod/.test(navigator.userAgent.toLowerCase()))
   );
 };
+
+export const isDesktopSafari = () => {
+  return typeof window !== "undefined" && (window as any).safari !== undefined;
+};
