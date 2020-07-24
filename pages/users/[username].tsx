@@ -440,12 +440,22 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const apolloClient = initializeApollo(null, ctx);
 
   try {
-    await apolloClient.query<GetUserProfile, GetUserProfileVariables>({
+    const result = await apolloClient.query<
+      GetUserProfile,
+      GetUserProfileVariables
+    >({
       query: GET_USER_PROFILE,
       variables: {
         username: ctx.params!.username as string,
       },
     });
+    if (result.data?.user.length === 0) {
+      const { res } = ctx;
+      res.writeHead(303, "Not found", {
+        Location: `/404`,
+      });
+      res.end();
+    }
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {

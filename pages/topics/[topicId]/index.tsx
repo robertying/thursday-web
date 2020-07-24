@@ -166,8 +166,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tags = Array.isArray(tag) ? tag : [tag];
 
   try {
+    let result;
     if (tag && tags.length !== 0) {
-      await apolloClient.query<
+      result = await apolloClient.query<
         GetTopicPostsByTags,
         GetTopicPostsByTagsVariables
       >({
@@ -178,10 +179,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         },
       });
     } else {
-      await apolloClient.query<GetTopicPosts, GetTopicPostsVariables>({
+      result = await apolloClient.query<GetTopicPosts, GetTopicPostsVariables>({
         query: GET_TOPIC_POSTS,
         variables: { id: parseInt(ctx.params!.topicId as string, 10) },
       });
+    }
+    if (result.data?.topic.length === 0) {
+      const { res } = ctx;
+      res.writeHead(303, "Not found", {
+        Location: `/404`,
+      });
+      res.end();
     }
   } catch (e) {
     const { res } = ctx;

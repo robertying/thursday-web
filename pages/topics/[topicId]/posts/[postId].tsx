@@ -655,10 +655,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const apolloClient = initializeApollo(null, ctx);
 
   try {
-    await apolloClient.query<GetPost, GetPostVariables>({
+    const result = await apolloClient.query<GetPost, GetPostVariables>({
       query: GET_POST,
       variables: { id: parseInt(ctx.params!.postId as string, 10) },
     });
+    if (result.data?.post.length === 0) {
+      const { res } = ctx;
+      res.writeHead(303, "Not found", {
+        Location: `/404`,
+      });
+      res.end();
+    }
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {
