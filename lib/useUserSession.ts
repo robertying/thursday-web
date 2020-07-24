@@ -17,7 +17,11 @@ const useUserSession = (poll?: boolean) => {
     } catch (e) {
       setUser(null);
       setSession(null);
-      if (window.location.pathname !== "/login") {
+      if (
+        !["/login", "/forgot", "/register", "/verify", "/404"].includes(
+          window.location.pathname
+        )
+      ) {
         router.push({
           pathname: "/login",
           query: {
