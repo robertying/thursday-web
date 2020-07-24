@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, Grid, Paper, Typography, Button } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
+import ChipInput from "material-ui-chip-input";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -11,11 +12,13 @@ import FloatingActions from "components/FloatingActions";
 import Layout from "components/Layout";
 import {
   GetTopicPosts,
+  GetTopicPostsByTags,
+  GetTopicPostsByTagsVariables,
   GetTopicPostsVariables,
   GetUser,
   GetUserVariables,
 } from "apis/types";
-import { GET_TOPIC_POSTS } from "apis/topic_post";
+import { GET_TOPIC_POSTS, GET_TOPIC_POSTS_BY_TAGS } from "apis/topic_post";
 import { initializeApollo } from "apis/client";
 import useUserId from "lib/useUserId";
 import { GET_USER } from "apis/user";
@@ -34,6 +37,16 @@ const useStyles = makeStyles((theme) =>
         margin: theme.spacing(2),
       },
     },
+    tagSearch: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      margin: theme.spacing(1),
+    },
+    chip: {
+      margin: theme.spacing(0.5),
+    },
   })
 );
 
@@ -50,12 +63,40 @@ const TopicPostPage: React.FC = () => {
   });
 
   const router = useRouter();
-  const { topicId } = router.query;
+  const { topicId, tag } = router.query;
+  const tags = tag ? (Array.isArray(tag) ? tag : [tag]) : [];
 
-  const { data } = useQuery<GetTopicPosts, GetTopicPostsVariables>(
+  const { data: d } = useQuery<GetTopicPosts, GetTopicPostsVariables>(
     GET_TOPIC_POSTS,
-    { variables: { id: parseInt(topicId as string, 10) } }
+    {
+      variables: { id: parseInt(topicId as string, 10) },
+      skip: tags.length !== 0,
+    }
   );
+  const { data: dT } = useQuery<
+    GetTopicPostsByTags,
+    GetTopicPostsByTagsVariables
+  >(GET_TOPIC_POSTS_BY_TAGS, {
+    variables: { id: parseInt(topicId as string, 10), tags },
+    skip: tags.length === 0,
+  });
+  const data = dT ?? d;
+
+  const [searchTags, setSearchTags] = useState(tags);
+
+  const handleAddChip = (tag: string) => {
+    setSearchTags([...tags, tag]);
+  };
+
+  const handleDeleteChip = (tag: string, index: number) => {
+    const newTags = [...searchTags];
+    newTags.splice(index, 1);
+    setSearchTags(newTags);
+  };
+
+  const handleTagSearchClick = async () => {
+    router.push({ pathname: `/topics/${topicId}`, query: { tag: searchTags } });
+  };
 
   return (
     <Layout
@@ -74,6 +115,20 @@ const TopicPostPage: React.FC = () => {
         direction="column"
         spacing={2}
       >
+        <div className={classes.tagSearch}>
+          <ChipInput
+            classes={{ chip: classes.chip }}
+            value={searchTags}
+            onAdd={(chip) => handleAddChip(chip)}
+            onDelete={(chip, index) => handleDeleteChip(chip, index)}
+            alwaysShowPlaceholder
+            placeholder="筛选标签"
+            blurBehavior="clear"
+            disableUnderline
+            fullWidth
+          />
+          <Button onClick={handleTagSearchClick}>搜索</Button>
+        </div>
         {data?.topic?.[0].posts.map((post) => (
           <Grid item key={post.id}>
             <Link
@@ -107,12 +162,27 @@ const TopicPostPage: React.FC = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const apolloClient = initializeApollo(null, ctx);
+  const { tag } = ctx.query;
+  const tags = Array.isArray(tag) ? tag : [tag];
 
   try {
-    await apolloClient.query<GetTopicPosts, GetTopicPostsVariables>({
-      query: GET_TOPIC_POSTS,
-      variables: { id: parseInt(ctx.params!.topicId as string, 10) },
-    });
+    if (tag && tags.length !== 0) {
+      await apolloClient.query<
+        GetTopicPostsByTags,
+        GetTopicPostsByTagsVariables
+      >({
+        query: GET_TOPIC_POSTS_BY_TAGS,
+        variables: {
+          id: parseInt(ctx.params!.topicId as string, 10),
+          tags: tags as string[],
+        },
+      });
+    } else {
+      await apolloClient.query<GetTopicPosts, GetTopicPostsVariables>({
+        query: GET_TOPIC_POSTS,
+        variables: { id: parseInt(ctx.params!.topicId as string, 10) },
+      });
+    }
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {

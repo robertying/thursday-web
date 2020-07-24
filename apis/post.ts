@@ -1,4 +1,9 @@
 import { gql } from "@apollo/client";
+import {
+  tag_constraint,
+  tag_obj_rel_insert_input,
+  tag_update_column,
+} from "./types";
 
 export const GET_POST = gql`
   query GetPost($id: Int!) {
@@ -61,6 +66,7 @@ export const ADD_POST = gql`
     $title: String!
     $content: String!
     $topic_id: Int!
+    $tags: [post_tag_insert_input!]!
   ) {
     insert_post_one(
       object: {
@@ -68,12 +74,21 @@ export const ADD_POST = gql`
         title: $title
         content: $content
         topic_id: $topic_id
+        post_tags: { data: $tags }
       }
     ) {
       id
     }
   }
 `;
+
+export const getTagInput = (name: string): tag_obj_rel_insert_input => ({
+  data: { name },
+  on_conflict: {
+    constraint: tag_constraint.tag_name_key,
+    update_columns: [tag_update_column.name],
+  },
+});
 
 export const UPDATE_POST = gql`
   mutation UpdatePost($post_id: Int!, $title: String!, $content: String!) {

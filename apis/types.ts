@@ -485,6 +485,7 @@ export interface AddPostVariables {
   title: string;
   content: string;
   topic_id: number;
+  tags: post_tag_insert_input[];
 }
 
 /* tslint:disable */
@@ -694,6 +695,20 @@ export interface UpdateReplyVariables {
 // GraphQL query operation: GetTopicPosts
 // ====================================================
 
+export interface GetTopicPosts_topic_posts_post_tags_tag {
+  __typename: "tag";
+  name: string;
+  id: uuid;
+}
+
+export interface GetTopicPosts_topic_posts_post_tags {
+  __typename: "post_tag";
+  /**
+   * An object relationship
+   */
+  tag: GetTopicPosts_topic_posts_post_tags_tag;
+}
+
 export interface GetTopicPosts_topic_posts_author {
   __typename: "user";
   username: string;
@@ -718,8 +733,13 @@ export interface GetTopicPosts_topic_posts_comments {
 export interface GetTopicPosts_topic_posts {
   __typename: "post";
   id: number;
+  topic_id: number;
   title: string;
   content: string;
+  /**
+   * An array relationship
+   */
+  post_tags: GetTopicPosts_topic_posts_post_tags[];
   updated_at: timestamptz;
   /**
    * An object relationship
@@ -750,6 +770,93 @@ export interface GetTopicPosts {
 
 export interface GetTopicPostsVariables {
   id: number;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: GetTopicPostsByTags
+// ====================================================
+
+export interface GetTopicPostsByTags_topic_posts_post_tags_tag {
+  __typename: "tag";
+  name: string;
+  id: uuid;
+}
+
+export interface GetTopicPostsByTags_topic_posts_post_tags {
+  __typename: "post_tag";
+  /**
+   * An object relationship
+   */
+  tag: GetTopicPostsByTags_topic_posts_post_tags_tag;
+}
+
+export interface GetTopicPostsByTags_topic_posts_author {
+  __typename: "user";
+  username: string;
+  avatar_url: string | null;
+}
+
+export interface GetTopicPostsByTags_topic_posts_comments_author {
+  __typename: "user";
+  username: string;
+  avatar_url: string | null;
+}
+
+export interface GetTopicPostsByTags_topic_posts_comments {
+  __typename: "comment";
+  id: number;
+  /**
+   * An object relationship
+   */
+  author: GetTopicPostsByTags_topic_posts_comments_author;
+}
+
+export interface GetTopicPostsByTags_topic_posts {
+  __typename: "post";
+  id: number;
+  topic_id: number;
+  title: string;
+  content: string;
+  /**
+   * An array relationship
+   */
+  post_tags: GetTopicPostsByTags_topic_posts_post_tags[];
+  updated_at: timestamptz;
+  /**
+   * An object relationship
+   */
+  author: GetTopicPostsByTags_topic_posts_author;
+  /**
+   * An array relationship
+   */
+  comments: GetTopicPostsByTags_topic_posts_comments[];
+}
+
+export interface GetTopicPostsByTags_topic {
+  __typename: "topic";
+  id: number;
+  name: string;
+  /**
+   * An array relationship
+   */
+  posts: GetTopicPostsByTags_topic_posts[];
+}
+
+export interface GetTopicPostsByTags {
+  /**
+   * fetch data from the table: "topic"
+   */
+  topic: GetTopicPostsByTags_topic[];
+}
+
+export interface GetTopicPostsByTagsVariables {
+  id: number;
+  tags: string[];
 }
 
 /* tslint:disable */
@@ -1088,6 +1195,63 @@ export interface UpdatePushSubscriptionVariables {
 // START Enums and Input Objects
 //==============================================================
 
+/**
+ * unique or primary key constraints on table "category"
+ */
+export enum category_constraint {
+  category_pkey = "category_pkey",
+}
+
+/**
+ * update columns of table "category"
+ */
+export enum category_update_column {
+  created_at = "created_at",
+  id = "id",
+  name = "name",
+  priority = "priority",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "comment"
+ */
+export enum comment_constraint {
+  comment_id_key = "comment_id_key",
+  comment_pkey = "comment_pkey",
+}
+
+/**
+ * unique or primary key constraints on table "comment_history"
+ */
+export enum comment_history_constraint {
+  comment_history_pkey = "comment_history_pkey",
+}
+
+/**
+ * update columns of table "comment_history"
+ */
+export enum comment_history_update_column {
+  comment_id = "comment_id",
+  content = "content",
+  created_at = "created_at",
+  revision = "revision",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "comment"
+ */
+export enum comment_update_column {
+  author_id = "author_id",
+  content = "content",
+  created_at = "created_at",
+  deleted = "deleted",
+  id = "id",
+  post_id = "post_id",
+  updated_at = "updated_at",
+}
+
 export enum emoji_reaction_enum {
   confused_face = "confused_face",
   eyes = "eyes",
@@ -1097,6 +1261,943 @@ export enum emoji_reaction_enum {
   rocket = "rocket",
   thumbs_down = "thumbs_down",
   thumbs_up = "thumbs_up",
+}
+
+/**
+ * unique or primary key constraints on table "post"
+ */
+export enum post_constraint {
+  post_id_key = "post_id_key",
+  post_pkey = "post_pkey",
+}
+
+/**
+ * unique or primary key constraints on table "post_history"
+ */
+export enum post_history_constraint {
+  post_history_pkey = "post_history_pkey",
+}
+
+/**
+ * update columns of table "post_history"
+ */
+export enum post_history_update_column {
+  content = "content",
+  created_at = "created_at",
+  post_id = "post_id",
+  revision = "revision",
+  title = "title",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "post_tag"
+ */
+export enum post_tag_constraint {
+  post_tag_pkey = "post_tag_pkey",
+}
+
+/**
+ * update columns of table "post_tag"
+ */
+export enum post_tag_update_column {
+  post_id = "post_id",
+  tag_id = "tag_id",
+}
+
+/**
+ * update columns of table "post"
+ */
+export enum post_update_column {
+  author_id = "author_id",
+  content = "content",
+  created_at = "created_at",
+  deleted = "deleted",
+  id = "id",
+  revision = "revision",
+  title = "title",
+  topic_id = "topic_id",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "reaction"
+ */
+export enum reaction_constraint {
+  reaction_id_key = "reaction_id_key",
+  reaction_pkey = "reaction_pkey",
+}
+
+/**
+ * update columns of table "reaction"
+ */
+export enum reaction_update_column {
+  comment_id = "comment_id",
+  created_at = "created_at",
+  id = "id",
+  post_id = "post_id",
+  reaction = "reaction",
+  updated_at = "updated_at",
+  user_id = "user_id",
+}
+
+/**
+ * unique or primary key constraints on table "reply"
+ */
+export enum reply_constraint {
+  reply_id_key = "reply_id_key",
+  reply_pkey = "reply_pkey",
+}
+
+/**
+ * unique or primary key constraints on table "reply_history"
+ */
+export enum reply_history_constraint {
+  reply_history_pkey = "reply_history_pkey",
+}
+
+/**
+ * update columns of table "reply_history"
+ */
+export enum reply_history_update_column {
+  content = "content",
+  created_at = "created_at",
+  reply_id = "reply_id",
+  revision = "revision",
+  updated_at = "updated_at",
+}
+
+/**
+ * update columns of table "reply"
+ */
+export enum reply_update_column {
+  author_id = "author_id",
+  comment_id = "comment_id",
+  content = "content",
+  created_at = "created_at",
+  deleted = "deleted",
+  id = "id",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "tag"
+ */
+export enum tag_constraint {
+  tag_name_key = "tag_name_key",
+  tag_pkey = "tag_pkey",
+}
+
+/**
+ * update columns of table "tag"
+ */
+export enum tag_update_column {
+  created_at = "created_at",
+  id = "id",
+  name = "name",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "topic"
+ */
+export enum topic_constraint {
+  topic_name_key = "topic_name_key",
+  topic_pkey = "topic_pkey",
+}
+
+/**
+ * update columns of table "topic"
+ */
+export enum topic_update_column {
+  category_id = "category_id",
+  created_at = "created_at",
+  id = "id",
+  name = "name",
+  priority = "priority",
+  updated_at = "updated_at",
+}
+
+/**
+ * unique or primary key constraints on table "user"
+ */
+export enum user_constraint {
+  user_email_key = "user_email_key",
+  user_pkey = "user_pkey",
+  user_username_key = "user_username_key",
+}
+
+/**
+ * update columns of table "user"
+ */
+export enum user_update_column {
+  avatar_url = "avatar_url",
+  created_at = "created_at",
+  email = "email",
+  id = "id",
+  status = "status",
+  updated_at = "updated_at",
+  username = "username",
+  web_push_subscription = "web_push_subscription",
+}
+
+/**
+ * expression to compare columns of type Boolean. All fields are combined with logical 'AND'.
+ */
+export interface Boolean_comparison_exp {
+  _eq?: boolean | null;
+  _gt?: boolean | null;
+  _gte?: boolean | null;
+  _in?: boolean[] | null;
+  _is_null?: boolean | null;
+  _lt?: boolean | null;
+  _lte?: boolean | null;
+  _neq?: boolean | null;
+  _nin?: boolean[] | null;
+}
+
+/**
+ * expression to compare columns of type Int. All fields are combined with logical 'AND'.
+ */
+export interface Int_comparison_exp {
+  _eq?: number | null;
+  _gt?: number | null;
+  _gte?: number | null;
+  _in?: number[] | null;
+  _is_null?: boolean | null;
+  _lt?: number | null;
+  _lte?: number | null;
+  _neq?: number | null;
+  _nin?: number[] | null;
+}
+
+/**
+ * expression to compare columns of type String. All fields are combined with logical 'AND'.
+ */
+export interface String_comparison_exp {
+  _eq?: string | null;
+  _gt?: string | null;
+  _gte?: string | null;
+  _ilike?: string | null;
+  _in?: string[] | null;
+  _is_null?: boolean | null;
+  _like?: string | null;
+  _lt?: string | null;
+  _lte?: string | null;
+  _neq?: string | null;
+  _nilike?: string | null;
+  _nin?: string[] | null;
+  _nlike?: string | null;
+  _nsimilar?: string | null;
+  _similar?: string | null;
+}
+
+/**
+ * expression to compare columns of type bigint. All fields are combined with logical 'AND'.
+ */
+export interface bigint_comparison_exp {
+  _eq?: bigint | null;
+  _gt?: bigint | null;
+  _gte?: bigint | null;
+  _in?: bigint[] | null;
+  _is_null?: boolean | null;
+  _lt?: bigint | null;
+  _lte?: bigint | null;
+  _neq?: bigint | null;
+  _nin?: bigint[] | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "category". All fields are combined with a logical 'AND'.
+ */
+export interface category_bool_exp {
+  _and?: (category_bool_exp | null)[] | null;
+  _not?: category_bool_exp | null;
+  _or?: (category_bool_exp | null)[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  priority?: Int_comparison_exp | null;
+  topics?: topic_bool_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "category"
+ */
+export interface category_insert_input {
+  created_at?: timestamptz | null;
+  id?: number | null;
+  name?: string | null;
+  priority?: number | null;
+  topics?: topic_arr_rel_insert_input | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "category"
+ */
+export interface category_obj_rel_insert_input {
+  data: category_insert_input;
+  on_conflict?: category_on_conflict | null;
+}
+
+/**
+ * on conflict condition type for table "category"
+ */
+export interface category_on_conflict {
+  constraint: category_constraint;
+  update_columns: category_update_column[];
+  where?: category_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "comment"
+ */
+export interface comment_arr_rel_insert_input {
+  data: comment_insert_input[];
+  on_conflict?: comment_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "comment". All fields are combined with a logical 'AND'.
+ */
+export interface comment_bool_exp {
+  _and?: (comment_bool_exp | null)[] | null;
+  _not?: comment_bool_exp | null;
+  _or?: (comment_bool_exp | null)[] | null;
+  author?: user_bool_exp | null;
+  author_id?: uuid_comparison_exp | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  deleted?: Boolean_comparison_exp | null;
+  history?: comment_history_bool_exp | null;
+  id?: Int_comparison_exp | null;
+  post?: post_bool_exp | null;
+  post_id?: Int_comparison_exp | null;
+  reaction_aggregate?: comment_reaction_bool_exp | null;
+  reactions?: reaction_bool_exp | null;
+  replies?: reply_bool_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "comment_history"
+ */
+export interface comment_history_arr_rel_insert_input {
+  data: comment_history_insert_input[];
+  on_conflict?: comment_history_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "comment_history". All fields are combined with a logical 'AND'.
+ */
+export interface comment_history_bool_exp {
+  _and?: (comment_history_bool_exp | null)[] | null;
+  _not?: comment_history_bool_exp | null;
+  _or?: (comment_history_bool_exp | null)[] | null;
+  comment?: comment_bool_exp | null;
+  comment_id?: Int_comparison_exp | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  revision?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "comment_history"
+ */
+export interface comment_history_insert_input {
+  comment?: comment_obj_rel_insert_input | null;
+  comment_id?: number | null;
+  content?: string | null;
+  created_at?: timestamptz | null;
+  revision?: number | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * on conflict condition type for table "comment_history"
+ */
+export interface comment_history_on_conflict {
+  constraint: comment_history_constraint;
+  update_columns: comment_history_update_column[];
+  where?: comment_history_bool_exp | null;
+}
+
+/**
+ * input type for inserting data into table "comment"
+ */
+export interface comment_insert_input {
+  author?: user_obj_rel_insert_input | null;
+  author_id?: uuid | null;
+  content?: string | null;
+  created_at?: timestamptz | null;
+  deleted?: boolean | null;
+  history?: comment_history_arr_rel_insert_input | null;
+  id?: number | null;
+  post?: post_obj_rel_insert_input | null;
+  post_id?: number | null;
+  reactions?: reaction_arr_rel_insert_input | null;
+  replies?: reply_arr_rel_insert_input | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "comment"
+ */
+export interface comment_obj_rel_insert_input {
+  data: comment_insert_input;
+  on_conflict?: comment_on_conflict | null;
+}
+
+/**
+ * on conflict condition type for table "comment"
+ */
+export interface comment_on_conflict {
+  constraint: comment_constraint;
+  update_columns: comment_update_column[];
+  where?: comment_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "comment_reaction". All fields are combined with a logical 'AND'.
+ */
+export interface comment_reaction_bool_exp {
+  _and?: (comment_reaction_bool_exp | null)[] | null;
+  _not?: comment_reaction_bool_exp | null;
+  _or?: (comment_reaction_bool_exp | null)[] | null;
+  comment_id?: Int_comparison_exp | null;
+  confused_face?: bigint_comparison_exp | null;
+  eyes?: bigint_comparison_exp | null;
+  grinning_face_with_smiling_eyes?: bigint_comparison_exp | null;
+  party_popper?: bigint_comparison_exp | null;
+  red_heart?: bigint_comparison_exp | null;
+  rocket?: bigint_comparison_exp | null;
+  thumbs_down?: bigint_comparison_exp | null;
+  thumbs_up?: bigint_comparison_exp | null;
+}
+
+/**
+ * expression to compare columns of type emoji_reaction_enum. All fields are combined with logical 'AND'.
+ */
+export interface emoji_reaction_enum_comparison_exp {
+  _eq?: emoji_reaction_enum | null;
+  _in?: emoji_reaction_enum[] | null;
+  _is_null?: boolean | null;
+  _neq?: emoji_reaction_enum | null;
+  _nin?: emoji_reaction_enum[] | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "post"
+ */
+export interface post_arr_rel_insert_input {
+  data: post_insert_input[];
+  on_conflict?: post_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "post". All fields are combined with a logical 'AND'.
+ */
+export interface post_bool_exp {
+  _and?: (post_bool_exp | null)[] | null;
+  _not?: post_bool_exp | null;
+  _or?: (post_bool_exp | null)[] | null;
+  author?: user_bool_exp | null;
+  author_id?: uuid_comparison_exp | null;
+  comments?: comment_bool_exp | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  deleted?: Boolean_comparison_exp | null;
+  history?: post_history_bool_exp | null;
+  id?: Int_comparison_exp | null;
+  post_tags?: post_tag_bool_exp | null;
+  reaction_aggregate?: post_reaction_bool_exp | null;
+  reactions?: reaction_bool_exp | null;
+  revision?: Int_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  topic?: topic_bool_exp | null;
+  topic_id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "post_history"
+ */
+export interface post_history_arr_rel_insert_input {
+  data: post_history_insert_input[];
+  on_conflict?: post_history_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "post_history". All fields are combined with a logical 'AND'.
+ */
+export interface post_history_bool_exp {
+  _and?: (post_history_bool_exp | null)[] | null;
+  _not?: post_history_bool_exp | null;
+  _or?: (post_history_bool_exp | null)[] | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  post?: post_bool_exp | null;
+  post_id?: Int_comparison_exp | null;
+  revision?: Int_comparison_exp | null;
+  title?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "post_history"
+ */
+export interface post_history_insert_input {
+  content?: string | null;
+  created_at?: timestamptz | null;
+  post?: post_obj_rel_insert_input | null;
+  post_id?: number | null;
+  revision?: number | null;
+  title?: string | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * on conflict condition type for table "post_history"
+ */
+export interface post_history_on_conflict {
+  constraint: post_history_constraint;
+  update_columns: post_history_update_column[];
+  where?: post_history_bool_exp | null;
+}
+
+/**
+ * input type for inserting data into table "post"
+ */
+export interface post_insert_input {
+  author?: user_obj_rel_insert_input | null;
+  author_id?: uuid | null;
+  comments?: comment_arr_rel_insert_input | null;
+  content?: string | null;
+  created_at?: timestamptz | null;
+  deleted?: boolean | null;
+  history?: post_history_arr_rel_insert_input | null;
+  id?: number | null;
+  post_tags?: post_tag_arr_rel_insert_input | null;
+  reactions?: reaction_arr_rel_insert_input | null;
+  revision?: number | null;
+  title?: string | null;
+  topic?: topic_obj_rel_insert_input | null;
+  topic_id?: number | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "post"
+ */
+export interface post_obj_rel_insert_input {
+  data: post_insert_input;
+  on_conflict?: post_on_conflict | null;
+}
+
+/**
+ * on conflict condition type for table "post"
+ */
+export interface post_on_conflict {
+  constraint: post_constraint;
+  update_columns: post_update_column[];
+  where?: post_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "post_reaction". All fields are combined with a logical 'AND'.
+ */
+export interface post_reaction_bool_exp {
+  _and?: (post_reaction_bool_exp | null)[] | null;
+  _not?: post_reaction_bool_exp | null;
+  _or?: (post_reaction_bool_exp | null)[] | null;
+  confused_face?: bigint_comparison_exp | null;
+  eyes?: bigint_comparison_exp | null;
+  grinning_face_with_smiling_eyes?: bigint_comparison_exp | null;
+  party_popper?: bigint_comparison_exp | null;
+  post_id?: Int_comparison_exp | null;
+  red_heart?: bigint_comparison_exp | null;
+  rocket?: bigint_comparison_exp | null;
+  thumbs_down?: bigint_comparison_exp | null;
+  thumbs_up?: bigint_comparison_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "post_tag"
+ */
+export interface post_tag_arr_rel_insert_input {
+  data: post_tag_insert_input[];
+  on_conflict?: post_tag_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "post_tag". All fields are combined with a logical 'AND'.
+ */
+export interface post_tag_bool_exp {
+  _and?: (post_tag_bool_exp | null)[] | null;
+  _not?: post_tag_bool_exp | null;
+  _or?: (post_tag_bool_exp | null)[] | null;
+  post?: post_bool_exp | null;
+  post_id?: Int_comparison_exp | null;
+  tag?: tag_bool_exp | null;
+  tag_id?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "post_tag"
+ */
+export interface post_tag_insert_input {
+  post?: post_obj_rel_insert_input | null;
+  post_id?: number | null;
+  tag?: tag_obj_rel_insert_input | null;
+  tag_id?: uuid | null;
+}
+
+/**
+ * on conflict condition type for table "post_tag"
+ */
+export interface post_tag_on_conflict {
+  constraint: post_tag_constraint;
+  update_columns: post_tag_update_column[];
+  where?: post_tag_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "reaction"
+ */
+export interface reaction_arr_rel_insert_input {
+  data: reaction_insert_input[];
+  on_conflict?: reaction_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "reaction". All fields are combined with a logical 'AND'.
+ */
+export interface reaction_bool_exp {
+  _and?: (reaction_bool_exp | null)[] | null;
+  _not?: reaction_bool_exp | null;
+  _or?: (reaction_bool_exp | null)[] | null;
+  comment?: comment_bool_exp | null;
+  comment_id?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: String_comparison_exp | null;
+  post?: post_bool_exp | null;
+  post_id?: Int_comparison_exp | null;
+  reaction?: emoji_reaction_enum_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  user_id?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "reaction"
+ */
+export interface reaction_insert_input {
+  comment?: comment_obj_rel_insert_input | null;
+  comment_id?: number | null;
+  created_at?: timestamptz | null;
+  id?: string | null;
+  post?: post_obj_rel_insert_input | null;
+  post_id?: number | null;
+  reaction?: emoji_reaction_enum | null;
+  updated_at?: timestamptz | null;
+  user_id?: uuid | null;
+}
+
+/**
+ * on conflict condition type for table "reaction"
+ */
+export interface reaction_on_conflict {
+  constraint: reaction_constraint;
+  update_columns: reaction_update_column[];
+  where?: reaction_bool_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "reply"
+ */
+export interface reply_arr_rel_insert_input {
+  data: reply_insert_input[];
+  on_conflict?: reply_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "reply". All fields are combined with a logical 'AND'.
+ */
+export interface reply_bool_exp {
+  _and?: (reply_bool_exp | null)[] | null;
+  _not?: reply_bool_exp | null;
+  _or?: (reply_bool_exp | null)[] | null;
+  author?: user_bool_exp | null;
+  author_id?: uuid_comparison_exp | null;
+  comment?: comment_bool_exp | null;
+  comment_id?: Int_comparison_exp | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  deleted?: Boolean_comparison_exp | null;
+  history?: reply_history_bool_exp | null;
+  id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "reply_history"
+ */
+export interface reply_history_arr_rel_insert_input {
+  data: reply_history_insert_input[];
+  on_conflict?: reply_history_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "reply_history". All fields are combined with a logical 'AND'.
+ */
+export interface reply_history_bool_exp {
+  _and?: (reply_history_bool_exp | null)[] | null;
+  _not?: reply_history_bool_exp | null;
+  _or?: (reply_history_bool_exp | null)[] | null;
+  content?: String_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  reply?: reply_bool_exp | null;
+  reply_id?: Int_comparison_exp | null;
+  revision?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "reply_history"
+ */
+export interface reply_history_insert_input {
+  content?: string | null;
+  created_at?: timestamptz | null;
+  reply?: reply_obj_rel_insert_input | null;
+  reply_id?: number | null;
+  revision?: number | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * on conflict condition type for table "reply_history"
+ */
+export interface reply_history_on_conflict {
+  constraint: reply_history_constraint;
+  update_columns: reply_history_update_column[];
+  where?: reply_history_bool_exp | null;
+}
+
+/**
+ * input type for inserting data into table "reply"
+ */
+export interface reply_insert_input {
+  author?: user_obj_rel_insert_input | null;
+  author_id?: uuid | null;
+  comment?: comment_obj_rel_insert_input | null;
+  comment_id?: number | null;
+  content?: string | null;
+  created_at?: timestamptz | null;
+  deleted?: boolean | null;
+  history?: reply_history_arr_rel_insert_input | null;
+  id?: number | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "reply"
+ */
+export interface reply_obj_rel_insert_input {
+  data: reply_insert_input;
+  on_conflict?: reply_on_conflict | null;
+}
+
+/**
+ * on conflict condition type for table "reply"
+ */
+export interface reply_on_conflict {
+  constraint: reply_constraint;
+  update_columns: reply_update_column[];
+  where?: reply_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "tag". All fields are combined with a logical 'AND'.
+ */
+export interface tag_bool_exp {
+  _and?: (tag_bool_exp | null)[] | null;
+  _not?: tag_bool_exp | null;
+  _or?: (tag_bool_exp | null)[] | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: uuid_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  tag_posts?: post_tag_bool_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "tag"
+ */
+export interface tag_insert_input {
+  created_at?: timestamptz | null;
+  id?: uuid | null;
+  name?: string | null;
+  tag_posts?: post_tag_arr_rel_insert_input | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "tag"
+ */
+export interface tag_obj_rel_insert_input {
+  data: tag_insert_input;
+  on_conflict?: tag_on_conflict | null;
+}
+
+/**
+ * on conflict condition type for table "tag"
+ */
+export interface tag_on_conflict {
+  constraint: tag_constraint;
+  update_columns: tag_update_column[];
+  where?: tag_bool_exp | null;
+}
+
+/**
+ * expression to compare columns of type timestamptz. All fields are combined with logical 'AND'.
+ */
+export interface timestamptz_comparison_exp {
+  _eq?: timestamptz | null;
+  _gt?: timestamptz | null;
+  _gte?: timestamptz | null;
+  _in?: timestamptz[] | null;
+  _is_null?: boolean | null;
+  _lt?: timestamptz | null;
+  _lte?: timestamptz | null;
+  _neq?: timestamptz | null;
+  _nin?: timestamptz[] | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "topic"
+ */
+export interface topic_arr_rel_insert_input {
+  data: topic_insert_input[];
+  on_conflict?: topic_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "topic". All fields are combined with a logical 'AND'.
+ */
+export interface topic_bool_exp {
+  _and?: (topic_bool_exp | null)[] | null;
+  _not?: topic_bool_exp | null;
+  _or?: (topic_bool_exp | null)[] | null;
+  category?: category_bool_exp | null;
+  category_id?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: Int_comparison_exp | null;
+  name?: String_comparison_exp | null;
+  posts?: post_bool_exp | null;
+  priority?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "topic"
+ */
+export interface topic_insert_input {
+  category?: category_obj_rel_insert_input | null;
+  category_id?: number | null;
+  created_at?: timestamptz | null;
+  id?: number | null;
+  name?: string | null;
+  posts?: post_arr_rel_insert_input | null;
+  priority?: number | null;
+  updated_at?: timestamptz | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "topic"
+ */
+export interface topic_obj_rel_insert_input {
+  data: topic_insert_input;
+  on_conflict?: topic_on_conflict | null;
+}
+
+/**
+ * on conflict condition type for table "topic"
+ */
+export interface topic_on_conflict {
+  constraint: topic_constraint;
+  update_columns: topic_update_column[];
+  where?: topic_bool_exp | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "user". All fields are combined with a logical 'AND'.
+ */
+export interface user_bool_exp {
+  _and?: (user_bool_exp | null)[] | null;
+  _not?: user_bool_exp | null;
+  _or?: (user_bool_exp | null)[] | null;
+  avatar_url?: String_comparison_exp | null;
+  comments?: comment_bool_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  email?: String_comparison_exp | null;
+  id?: uuid_comparison_exp | null;
+  posts?: post_bool_exp | null;
+  replies?: reply_bool_exp | null;
+  status?: String_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  username?: String_comparison_exp | null;
+  web_push_subscription?: String_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "user"
+ */
+export interface user_insert_input {
+  avatar_url?: string | null;
+  comments?: comment_arr_rel_insert_input | null;
+  created_at?: timestamptz | null;
+  email?: string | null;
+  id?: uuid | null;
+  posts?: post_arr_rel_insert_input | null;
+  replies?: reply_arr_rel_insert_input | null;
+  status?: string | null;
+  updated_at?: timestamptz | null;
+  username?: string | null;
+  web_push_subscription?: string | null;
+}
+
+/**
+ * input type for inserting object relation for remote table "user"
+ */
+export interface user_obj_rel_insert_input {
+  data: user_insert_input;
+  on_conflict?: user_on_conflict | null;
+}
+
+/**
+ * on conflict condition type for table "user"
+ */
+export interface user_on_conflict {
+  constraint: user_constraint;
+  update_columns: user_update_column[];
+  where?: user_bool_exp | null;
+}
+
+/**
+ * expression to compare columns of type uuid. All fields are combined with logical 'AND'.
+ */
+export interface uuid_comparison_exp {
+  _eq?: uuid | null;
+  _gt?: uuid | null;
+  _gte?: uuid | null;
+  _in?: uuid[] | null;
+  _is_null?: boolean | null;
+  _lt?: uuid | null;
+  _lte?: uuid | null;
+  _neq?: uuid | null;
+  _nin?: uuid[] | null;
 }
 
 //==============================================================

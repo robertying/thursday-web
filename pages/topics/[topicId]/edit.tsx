@@ -12,6 +12,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Close } from "@material-ui/icons";
+import ChipInput from "material-ui-chip-input";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -29,7 +30,7 @@ import {
   UpdatePost,
   UpdatePostVariables,
 } from "apis/types";
-import { ADD_POST, UPDATE_POST } from "apis/post";
+import { ADD_POST, getTagInput, UPDATE_POST } from "apis/post";
 import { initializeApollo } from "apis/client";
 import { GET_TOPIC_BY_ID } from "apis/topic";
 import useUserId from "lib/useUserId";
@@ -64,14 +65,14 @@ const useStyles = makeStyles((theme) =>
     },
     input: {
       margin: theme.spacing(2),
-      paddingLeft: theme.spacing(3),
-      paddingRight: theme.spacing(3),
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(2),
       fontSize: 18,
     },
     license: {
       margin: theme.spacing(2),
-      paddingLeft: theme.spacing(3),
-      paddingRight: theme.spacing(3),
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(2),
     },
     editor: {
       height: "calc(100vh - 64px - 72px - 48px)",
@@ -82,6 +83,9 @@ const useStyles = makeStyles((theme) =>
       left: 0,
       right: 0,
       zIndex: 1199,
+    },
+    chip: {
+      margin: theme.spacing(0.5),
     },
   })
 );
@@ -97,6 +101,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
   const post = router.query.post
     ? (JSON.parse(router.query.post as string) as GetPost_post)
     : null;
+  const defaultTags = (router.query.defaultTags ?? []) as string[];
 
   useEffect(() => {
     if (!topic) {
@@ -183,6 +188,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
           topic_id: topic!.id,
           title,
           content: v,
+          tags: tags.map((tag) => ({ tag: getTagInput(tag) })),
         },
       });
       setMessage("发表成功！");
@@ -198,6 +204,22 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
   const [message, setMessage] = useState("");
 
   useBeforeReload(true);
+
+  const [tags, setTags] = useState<string[]>(defaultTags);
+
+  const handleAddChip = (tag: string) => {
+    if (tags.length === 5) {
+      setMessage("最多只能添加 5 个标签");
+      return;
+    }
+    setTags([...tags, tag]);
+  };
+
+  const handleDeleteChip = (tag: string, index: number) => {
+    const newTags = [...tags];
+    newTags.splice(index, 1);
+    setTags(newTags);
+  };
 
   return (
     <div className={classes.root}>
@@ -243,6 +265,19 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
         placeholder="标题"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+      />
+      <Divider />
+      <ChipInput
+        className={classes.input}
+        classes={{ chip: classes.chip }}
+        value={tags}
+        onAdd={(chip) => handleAddChip(chip)}
+        onDelete={(chip, index) => handleDeleteChip(chip, index)}
+        alwaysShowPlaceholder
+        placeholder="添加标签"
+        blurBehavior="ignore"
+        disableUnderline
+        fullWidth
       />
       <Divider />
       <Editor
