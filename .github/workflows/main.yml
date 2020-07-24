@@ -4,6 +4,10 @@ on:
   push:
     branches: [master]
 
+env:
+  API_URL: https://api.thu.community
+  HASURA_GRAPHQL_ADMIN_SECRET: ${{ secrets.HASURA_GRAPHQL_ADMIN_SECRET }}
+
 jobs:
   check:
     runs-on: ubuntu-latest
