@@ -6,16 +6,19 @@ import {
   CardHeader,
   IconButton,
   Grid,
+  ChipProps,
+  Chip,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Share, Edit } from "@material-ui/icons";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import dayjs from "dayjs";
 import EmojiSelector from "./EmojiSelector";
 import MyEditor from "./Editor";
 import { GetPost_post, emoji_reaction_enum } from "apis/types";
 import { deserialize } from "lib/slatejs";
 import Avatar from "components/Avatar";
-import Link from "next/link";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -33,6 +36,13 @@ const useStyles = makeStyles((theme) =>
     actions: {
       padding: theme.spacing(1),
     },
+    chips: {
+      padding: theme.spacing(2),
+      display: "block",
+    },
+    chip: {
+      margin: theme.spacing(0.5),
+    },
   })
 );
 
@@ -49,14 +59,42 @@ const Post: React.FC<PostProps> = ({
   author,
   updated_at,
   reaction_aggregate,
+  post_tags,
+  topic,
   onReact,
   onEdit,
   onShare,
 }) => {
   const classes = useStyles();
 
+  const router = useRouter();
+
+  const handleChipMouseDown: ChipProps["onMouseDown"] = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
   return (
     <Card>
+      {post_tags && post_tags.length > 0 && (
+        <CardActions classes={{ root: classes.chips }}>
+          {post_tags.map((pt) => (
+            <Chip
+              className={classes.chip}
+              onMouseDown={handleChipMouseDown}
+              onClick={(e) => {
+                handleChipMouseDown(e);
+                router.push({
+                  pathname: `/topics/${topic.id}`,
+                  query: { tag: pt.tag.name },
+                });
+              }}
+              key={pt.tag.id}
+              label={pt.tag.name}
+            />
+          ))}
+        </CardActions>
+      )}
       <CardHeader
         avatar={
           <Link href="/users/[userId]" as={`/users/${author.username}`}>
