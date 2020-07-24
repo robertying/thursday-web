@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) =>
       margin: "auto",
       padding: theme.spacing(4),
       width: "15vw",
-      minWidth: 320,
+      minWidth: 330,
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",

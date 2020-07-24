@@ -285,7 +285,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
               }}
             >
               <a>
-                <Button>验证清华身份</Button>
+                <Button variant="outlined">验证清华身份</Button>
               </a>
             </Link>
           )}

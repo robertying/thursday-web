@@ -102,7 +102,11 @@ const VerifyPage: React.FC = () => {
         if (!response.ok) {
           throw new Error("Verification failed");
         }
-        setMessage({ text: "清华身份验证成功" });
+        setMessage({
+          text: "清华身份验证成功",
+          duration: null,
+        });
+        setTimeout(() => router.push("/login"), 1000);
       } catch (e) {
         setMessage({ text: "清华身份验证失败" });
       } finally {
