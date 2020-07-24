@@ -1465,7 +1465,6 @@ export enum topic_update_column {
  * unique or primary key constraints on table "user"
  */
 export enum user_constraint {
-  user_email_key = "user_email_key",
   user_pkey = "user_pkey",
   user_username_key = "user_username_key",
 }
