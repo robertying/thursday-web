@@ -31,7 +31,7 @@ import {
   Notifications,
   NotificationsNone,
 } from "@material-ui/icons";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import { useQuery, useMutation } from "@apollo/client";
 import {
@@ -110,6 +110,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const theme = useTheme();
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const router = useRouter();
+
   const userId = useUserId();
   const [pushEnabled, subscribe] = usePushSubscription();
 
@@ -182,13 +184,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             >
               {backHref && (
                 <Grid item>
-                  <Link href={backHref} as={backAs}>
-                    <a>
-                      <IconButton size={sm ? "small" : "medium"}>
-                        <ArrowBack />
-                      </IconButton>
-                    </a>
-                  </Link>
+                  <IconButton
+                    size={sm ? "small" : "medium"}
+                    onClick={router.back}
+                  >
+                    <ArrowBack />
+                  </IconButton>
                 </Grid>
               )}
               <Grid item>
@@ -199,7 +200,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               <Grid item xs>
                 <Tabs
                   value={page === "" || page === "topics" ? page : false}
-                  onChange={(e, value) => Router.push(`/${value}`)}
+                  onChange={(e, value) => router.push(`/${value}`)}
                   indicatorColor="primary"
                   textColor="primary"
                   centered
