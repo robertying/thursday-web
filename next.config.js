@@ -20,6 +20,7 @@ module.exports = withPlugins(
     ],
   ],
   {
+    reactStrictMode: true,
     assetPrefix:
       process.env.NODE_ENV === "production"
         ? "https://thursday.cdn.robertying.net"
