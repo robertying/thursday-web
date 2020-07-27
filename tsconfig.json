@@ -20,8 +20,8 @@
   "include": [
     "next-env.d.ts",
     "graphql-env.d.ts",
-    "global.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "@types/**/*"
   ]
 }
