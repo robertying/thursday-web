@@ -108,6 +108,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   userAvatarUrl,
 }) => {
   const theme = useTheme();
+  const xs = useMediaQuery("(max-width: 375px)");
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const router = useRouter();
@@ -179,8 +180,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               direction="row"
               alignItems="center"
               justify="flex-start"
-              spacing={1}
-              wrap="nowrap"
+              spacing={xs ? 0 : 1}
             >
               {backHref && (
                 <Grid item>
