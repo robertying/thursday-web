@@ -2,7 +2,7 @@ import { URLSearchParams } from "url";
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 import CORS, { CorsOptions } from "cors";
-import { getTokenFromCookie } from "./cookie";
+import { getUserSession } from "apis/cognito";
 
 const client = jwksClient({
   jwksUri: process.env.JWKS_URL!,
@@ -67,7 +67,8 @@ export const recaptcha = async (req: any, res: any, next: any) => {
 };
 
 export const auth = async (req: any, res: any, next: any) => {
-  const token = getTokenFromCookie({ req } as any);
+  const { session } = await getUserSession({ req } as any);
+  const token = session?.getIdToken().getJwtToken();
   if (!token) {
     return res.status(401).send("401 Unauthorized: Missing token");
   }

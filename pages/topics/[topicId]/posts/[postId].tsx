@@ -68,6 +68,7 @@ import {
 import useUserId from "lib/useUserId";
 import { isDesktopSafari, isMobile } from "lib/platform";
 import useBeforeReload from "lib/useBeforeReload";
+import { getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -652,9 +653,11 @@ const PostPage: React.FC = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const apolloClient = initializeApollo(null, ctx);
-
   try {
+    const { session } = await getUserSession(ctx);
+
+    const apolloClient = initializeApollo(null, session);
+
     const result = await apolloClient.query<GetPost, GetPostVariables>({
       query: GET_POST,
       variables: { id: parseInt(ctx.params!.postId as string, 10) },
@@ -665,20 +668,26 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         Location: `/404`,
       });
       res.end();
+      return {
+        props: {},
+      };
     }
+
+    return {
+      props: {
+        initialApolloState: apolloClient.cache.extract(),
+      },
+    };
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {
       Location: `/login?redirect_url=${ctx.req.url}`,
     });
     res.end();
+    return {
+      props: {},
+    };
   }
-
-  return {
-    props: {
-      initialApolloState: apolloClient.cache.extract(),
-    },
-  };
 };
 
 export default PostPage;

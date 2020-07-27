@@ -8,9 +8,8 @@ import {
 } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
 import { useMemo } from "react";
-import { GetServerSidePropsContext } from "next";
-import { ParsedUrlQuery } from "querystring";
-import { getTokenFromCookie } from "lib/cookie";
+import { CognitoUserSession } from "amazon-cognito-identity-js";
+import { getUserSession } from "./cognito";
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
@@ -18,8 +17,9 @@ const httpLink = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_API_URL}/v1/graphql`,
 });
 
-const authLink = setContext((_, { headers }) => {
-  const token = getTokenFromCookie();
+const authLink = setContext(async (_, { headers }) => {
+  const { session } = await getUserSession();
+  const token = session?.getIdToken().getJwtToken();
   return {
     headers: {
       ...headers,
@@ -32,11 +32,11 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-function createApolloClient(ctx?: GetServerSidePropsContext<ParsedUrlQuery>) {
+function createApolloClient(session?: CognitoUserSession) {
   let link: ApolloLink | null;
 
   if (typeof window === "undefined") {
-    const token = getTokenFromCookie(ctx);
+    const token = session?.getIdToken().getJwtToken();
     link = new HttpLink({
       uri: `${process.env.API_URL}/v1/graphql`,
       headers: token
@@ -64,9 +64,9 @@ function createApolloClient(ctx?: GetServerSidePropsContext<ParsedUrlQuery>) {
 
 export function initializeApollo(
   initialState: NormalizedCacheObject | null = null,
-  ctx?: GetServerSidePropsContext<ParsedUrlQuery>
+  session?: CognitoUserSession
 ) {
-  const _apolloClient = apolloClient ?? createApolloClient(ctx);
+  const _apolloClient = apolloClient ?? createApolloClient(session);
 
   if (initialState) {
     _apolloClient.cache.restore(initialState);

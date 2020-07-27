@@ -48,7 +48,7 @@ import dayjs from "dayjs";
 import useUserId from "lib/useUserId";
 import Upload from "components/Upload";
 import Avatar from "components/Avatar";
-import { changePassword, signOut } from "apis/cognito";
+import { changePassword, getUserSession, signOut } from "apis/cognito";
 import { validatePassword } from "lib/validate";
 
 const useStyles = makeStyles((theme) =>
@@ -437,9 +437,11 @@ const ProfilePage: React.FC = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const apolloClient = initializeApollo(null, ctx);
-
   try {
+    const { session } = await getUserSession(ctx);
+
+    const apolloClient = initializeApollo(null, session);
+
     const result = await apolloClient.query<
       GetUserProfile,
       GetUserProfileVariables
@@ -455,20 +457,26 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         Location: `/404`,
       });
       res.end();
+      return {
+        props: {},
+      };
     }
+
+    return {
+      props: {
+        initialApolloState: apolloClient.cache.extract(),
+      },
+    };
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {
       Location: `/login?redirect_url=${ctx.req.url}`,
     });
     res.end();
+    return {
+      props: {},
+    };
   }
-
-  return {
-    props: {
-      initialApolloState: apolloClient.cache.extract(),
-    },
-  };
 };
 
 export default ProfilePage;

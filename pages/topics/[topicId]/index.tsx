@@ -22,6 +22,7 @@ import { GET_TOPIC_POSTS, GET_TOPIC_POSTS_BY_TAGS } from "apis/topic_post";
 import { initializeApollo } from "apis/client";
 import useUserId from "lib/useUserId";
 import { GET_USER } from "apis/user";
+import { getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -161,11 +162,14 @@ const TopicPostPage: React.FC = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const apolloClient = initializeApollo(null, ctx);
-  const { tag } = ctx.query;
-  const tags = Array.isArray(tag) ? tag : [tag];
-
   try {
+    const { session } = await getUserSession(ctx);
+
+    const apolloClient = initializeApollo(null, session);
+
+    const { tag } = ctx.query;
+    const tags = Array.isArray(tag) ? tag : [tag];
+
     let result;
     if (tag && tags.length !== 0) {
       result = await apolloClient.query<
@@ -190,20 +194,26 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         Location: `/404`,
       });
       res.end();
+      return {
+        props: {},
+      };
     }
+
+    return {
+      props: {
+        initialApolloState: apolloClient.cache.extract(),
+      },
+    };
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {
       Location: `/login?redirect_url=${ctx.req.url}`,
     });
     res.end();
+    return {
+      props: {},
+    };
   }
-
-  return {
-    props: {
-      initialApolloState: apolloClient.cache.extract(),
-    },
-  };
 };
 
 export default TopicPostPage;

@@ -44,6 +44,7 @@ import {
 } from "lib/slatejs";
 import { isDesktopSafari, isMobile } from "lib/platform";
 import useBeforeReload from "lib/useBeforeReload";
+import { getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -303,9 +304,11 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
 export const getServerSideProps: GetServerSideProps<EditPageProps> = async (
   ctx
 ) => {
-  const apolloClient = initializeApollo(null, ctx);
-
   try {
+    const { session } = await getUserSession(ctx);
+
+    const apolloClient = initializeApollo(null, session);
+
     const response = await apolloClient.query<
       GetTopicById,
       GetTopicByIdVariables
@@ -313,6 +316,7 @@ export const getServerSideProps: GetServerSideProps<EditPageProps> = async (
       query: GET_TOPIC_BY_ID,
       variables: { id: parseInt(ctx.params!.topicId as string, 10) },
     });
+
     return {
       props: {
         topic: response.data?.topic_by_pk,
@@ -324,11 +328,10 @@ export const getServerSideProps: GetServerSideProps<EditPageProps> = async (
       Location: `/login?redirect_url=${ctx.req.url}`,
     });
     res.end();
+    return {
+      props: {},
+    };
   }
-
-  return {
-    props: {},
-  };
 };
 
 export default EditPage;

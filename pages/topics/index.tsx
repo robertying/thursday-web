@@ -19,6 +19,7 @@ import { initializeApollo } from "apis/client";
 import useUserId from "lib/useUserId";
 import { GET_USER } from "apis/user";
 import FloatingActions from "components/FloatingActions";
+import { getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -129,25 +130,30 @@ const TopicPage: React.FC = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const apolloClient = initializeApollo(null, ctx);
-
   try {
+    const { session } = await getUserSession(ctx);
+
+    const apolloClient = initializeApollo(null, session);
+
     await apolloClient.query<GetTopics>({
       query: GET_TOPICS,
     });
+
+    return {
+      props: {
+        initialApolloState: apolloClient.cache.extract(),
+      },
+    };
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {
-      Location: `/login?redirect_url=${ctx.req.url}`,
+      Location: `/login?redirect_url=/topics`,
     });
     res.end();
+    return {
+      props: {},
+    };
   }
-
-  return {
-    props: {
-      initialApolloState: apolloClient.cache.extract(),
-    },
-  };
 };
 
 export default TopicPage;

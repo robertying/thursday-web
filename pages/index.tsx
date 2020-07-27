@@ -24,6 +24,7 @@ import { GET_NEWEST_POSTS, GET_TOP_POSTS } from "apis/home";
 import { GET_USER } from "apis/user";
 import useUserId from "lib/useUserId";
 import FloatingActions from "components/FloatingActions";
+import { getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -240,9 +241,11 @@ const HomePage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const apolloClient = initializeApollo(null, ctx);
-
   try {
+    const { session } = await getUserSession(ctx);
+
+    const apolloClient = initializeApollo(null, session);
+
     await Promise.all([
       apolloClient.query<GetTopPosts>({
         query: GET_TOP_POSTS,
@@ -251,19 +254,22 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         query: GET_NEWEST_POSTS,
       }),
     ]);
+
+    return {
+      props: {
+        initialApolloState: apolloClient.cache.extract(),
+      },
+    };
   } catch (e) {
     const { res } = ctx;
     res.writeHead(303, "Unauthorized", {
       Location: "/login",
     });
     res.end();
+    return {
+      props: {},
+    };
   }
-
-  return {
-    props: {
-      initialApolloState: apolloClient.cache.extract(),
-    },
-  };
 };
 
 export default HomePage;
