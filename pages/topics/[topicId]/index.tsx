@@ -148,7 +148,12 @@ const TopicPostPage: React.FC = () => {
             <Typography variant="body1" gutterBottom>
               此话题下暂无相关帖子
             </Typography>
-            <Link href="/topics/[topicId]/edit" as={`/topics/${topicId}/edit`}>
+            <Link
+              href={{
+                pathname: `/topics/${topicId}/edit`,
+                query: tag && { tag },
+              }}
+            >
               <a>
                 <Button color="primary">发表帖子</Button>
               </a>

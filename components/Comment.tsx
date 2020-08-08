@@ -125,16 +125,20 @@ const Comment: React.FC<CommentProps> = ({
                 </IconButton>
               </Grid>
             )}
-            <Grid item>
-              <IconButton onClick={() => onReply?.(id)}>
-                <Reply />
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <IconButton onClick={() => onShare?.(id)}>
-                <Share />
-              </IconButton>
-            </Grid>
+            {onReply && (
+              <Grid item>
+                <IconButton onClick={() => onReply?.(id)}>
+                  <Reply />
+                </IconButton>
+              </Grid>
+            )}
+            {onShare && (
+              <Grid item>
+                <IconButton onClick={() => onShare?.(id)}>
+                  <Share />
+                </IconButton>
+              </Grid>
+            )}
           </div>
         </Grid>
       </CardActions>

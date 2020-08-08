@@ -52,6 +52,7 @@ const FloatingActions: React.FC<FloatingActionsProps> = ({
 
   const router = useRouter();
   const topicId = router.query.topicId;
+  const { tag } = router.query;
 
   return (
     <div className={classes.root}>
@@ -79,7 +80,12 @@ const FloatingActions: React.FC<FloatingActionsProps> = ({
         </Grid>
         {edit && (
           <Grid item>
-            <Link href="/topics/[topicId]/edit" as={`/topics/${topicId}/edit`}>
+            <Link
+              href={{
+                pathname: `/topics/${topicId}/edit`,
+                query: tag && { tag },
+              }}
+            >
               <a>
                 <Fab color="primary" size="small">
                   <Add />

@@ -19,6 +19,7 @@ import {
   FormControlLabel,
   Divider,
   Snackbar,
+  Button,
 } from "@material-ui/core";
 import {
   makeStyles,
@@ -43,6 +44,7 @@ import {
 import { GET_ACTIVITIES, MARK_ACTIVITY_READ } from "apis/activity";
 import useUserId from "lib/useUserId";
 import usePushSubscription from "lib/usePushSubscription";
+import { isLearnXUser } from "lib/learnx";
 import Avatar from "components/Avatar";
 import ElevateOnScroll from "./ElevateOnScroll";
 
@@ -126,7 +128,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
     variables: {
       user_id: userId!,
     },
-    skip: !userId,
+    skip: !userId || isLearnXUser(userId),
   });
   const [markActivityRead] = useMutation<
     MarkActivityRead,
@@ -182,7 +184,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               justify="flex-start"
               spacing={xs ? 0 : 1}
             >
-              {backHref && (
+              {((isLearnXUser(userId) && router.asPath.includes("/posts/")) ||
+                (!isLearnXUser(userId) && backHref)) && (
                 <Grid item>
                   <IconButton
                     size={sm ? "small" : "medium"}
@@ -206,13 +209,20 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   centered
                   scrollButtons="auto"
                 >
-                  <StyledTab label="主页" value="" />
-                  <StyledTab label="话题" value="topics" />
+                  {!isLearnXUser(userId) && (
+                    <>
+                      <StyledTab label="主页" value="" />
+                      <StyledTab label="话题" value="topics" />
+                    </>
+                  )}
                 </Tabs>
               </Grid>
               <Grid
                 item
-                style={{ visibility: username ? "visible" : "hidden" }}
+                style={{
+                  visibility:
+                    !username || isLearnXUser(userId) ? "hidden" : "visible",
+                }}
               >
                 <IconButton
                   onClick={handleActivityClick}
@@ -229,7 +239,23 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               </Grid>
               <Grid
                 item
-                style={{ visibility: username ? "visible" : "hidden" }}
+                style={{
+                  visibility: isLearnXUser(userId) ? "visible" : "hidden",
+                }}
+              >
+                <Link href="/register">
+                  <a>
+                    <Button color="primary" size="small">
+                      注册
+                    </Button>
+                  </a>
+                </Link>
+              </Grid>
+              <Grid
+                item
+                style={{
+                  visibility: !username ? "hidden" : "visible",
+                }}
               >
                 <Link href="/users/[username]" as={`/users/${username}`}>
                   <a>

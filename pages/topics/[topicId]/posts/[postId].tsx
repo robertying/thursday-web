@@ -68,6 +68,7 @@ import {
 import useUserId from "lib/useUserId";
 import { isDesktopSafari, isMobile } from "lib/platform";
 import useBeforeReload from "lib/useBeforeReload";
+import { isLearnXUser } from "lib/learnx";
 import { getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
@@ -159,6 +160,10 @@ const PostPage: React.FC = () => {
           },
         });
       }
+      if (e.message.includes('field "insert_reaction_one" not found')) {
+        setMessage("你无法这么做，请注册正式账号");
+        return;
+      }
     }
 
     await refetch();
@@ -188,6 +193,10 @@ const PostPage: React.FC = () => {
             id: `${userId}-comment-${id}-${reaction}`,
           },
         });
+      }
+      if (e.message.includes('field "insert_reaction_one" not found')) {
+        setMessage("你无法这么做，请注册正式账号");
+        return;
       }
     }
 
@@ -486,7 +495,8 @@ const PostPage: React.FC = () => {
             {...post!}
             onReact={handleReactPost}
             onEdit={
-              post?.author.username === userData?.user_by_pk?.username
+              post?.author.username === userData?.user_by_pk?.username &&
+              !isLearnXUser(userId)
                 ? handlePostEdit
                 : undefined
             }
@@ -514,6 +524,10 @@ const PostPage: React.FC = () => {
                 handleReplyModalOpen();
               }}
               onReply={() => {
+                if (isLearnXUser(userId)) {
+                  setMessage("你无法这么做，请注册正式账号");
+                  return;
+                }
                 setReplyToCommentId(comment.id);
                 handleEditClick();
               }}
@@ -553,7 +567,10 @@ const PostPage: React.FC = () => {
           ))}
         </DialogContent>
       </Dialog>
-      <FloatingActions comment onCommentClick={handleEditClick} />
+      <FloatingActions
+        comment={!isLearnXUser(userId)}
+        onCommentClick={handleEditClick}
+      />
       <Dialog
         open={editDialogOpen}
         onClose={handleEditClose}
