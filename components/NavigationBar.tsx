@@ -110,7 +110,6 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   userAvatarUrl,
 }) => {
   const theme = useTheme();
-  const xs = useMediaQuery("(max-width: 375px)");
   const sm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const router = useRouter();
@@ -181,8 +180,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               container
               direction="row"
               alignItems="center"
-              justify="flex-start"
-              spacing={xs ? 0 : 1}
+              justify="space-between"
+              spacing={1}
+              wrap="nowrap"
+              style={{ overflow: "hidden" }}
             >
               {((isLearnXUser(userId) && router.asPath.includes("/posts/")) ||
                 (!isLearnXUser(userId) && backHref)) && (
@@ -196,26 +197,24 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 </Grid>
               )}
               <Grid item>
-                <Typography variant={sm ? "h6" : "h4"}>
+                <Typography variant={sm ? "h6" : "h4"} noWrap>
                   {title ?? "星期四"}
                 </Typography>
               </Grid>
-              <Grid item xs>
-                <Tabs
-                  value={page === "" || page === "topics" ? page : false}
-                  onChange={(e, value) => router.push(`/${value}`)}
-                  indicatorColor="primary"
-                  textColor="primary"
-                  centered
-                  scrollButtons="auto"
-                >
-                  {!isLearnXUser(userId) && (
-                    <>
-                      <StyledTab label="主页" value="" />
-                      <StyledTab label="话题" value="topics" />
-                    </>
-                  )}
-                </Tabs>
+              <Grid item xs style={{ overflow: "auto", minHeight: 64 }}>
+                {!isLearnXUser(userId) && (
+                  <Tabs
+                    value={page === "" || page === "topics" ? page : false}
+                    onChange={(e, value) => router.push(`/${value}`)}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    centered
+                    scrollButtons="auto"
+                  >
+                    <StyledTab label="主页" value="" />
+                    <StyledTab label="话题" value="topics" />
+                  </Tabs>
+                )}
               </Grid>
               <Grid
                 item
@@ -240,7 +239,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
               <Grid
                 item
                 style={{
-                  visibility: isLearnXUser(userId) ? "visible" : "hidden",
+                  display: isLearnXUser(userId) ? "initial" : "none",
                 }}
               >
                 <Button
