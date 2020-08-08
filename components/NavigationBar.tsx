@@ -243,13 +243,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   visibility: isLearnXUser(userId) ? "visible" : "hidden",
                 }}
               >
-                <Link href="/register">
-                  <a>
-                    <Button color="primary" size="small">
-                      注册
-                    </Button>
-                  </a>
-                </Link>
+                <Button
+                  color="primary"
+                  size="small"
+                  onClick={() => (window.location.href = "/register")}
+                >
+                  注册
+                </Button>
               </Grid>
               <Grid
                 item
