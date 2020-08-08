@@ -14,7 +14,6 @@ import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Close } from "@material-ui/icons";
 import ChipInput from "material-ui-chip-input";
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { Node } from "slate";
@@ -234,13 +233,9 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
       )}
       <AppBar className={classes.appBar}>
         <Toolbar className={classes.toolbar}>
-          <Link href="/topics/[topicId]" as={`/topics/${topic?.id}`}>
-            <a>
-              <IconButton edge="start" color="inherit">
-                <Close />
-              </IconButton>
-            </a>
-          </Link>
+          <IconButton edge="start" color="inherit" onClick={router.back}>
+            <Close />
+          </IconButton>
           <Typography variant="h6" style={{ flex: 1 }}>
             #{topic!.name}
           </Typography>
