@@ -50,6 +50,7 @@ import Upload from "components/Upload";
 import Avatar from "components/Avatar";
 import { changePassword, getUserSession, signOut } from "apis/cognito";
 import { validatePassword } from "lib/validate";
+import { isLearnXUser } from "lib/learnx";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -271,7 +272,7 @@ const ProfilePage: React.FC = () => {
       >
         <ButtonBase
           className={classes.avatarOverlay}
-          disabled={!self}
+          disabled={!self || isLearnXUser(userId)}
           onClick={() => setUploadOpen(true)}
           onMouseOver={() => self && setHover(true)}
           onMouseLeave={() => self && setHover(false)}
@@ -289,13 +290,13 @@ const ProfilePage: React.FC = () => {
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
           {user?.status || "未填写状态……"}
-          {self && (
+          {self && !isLearnXUser(userId) && (
             <IconButton className={classes.editButton} onClick={handleEditOpen}>
               <Edit />
             </IconButton>
           )}
         </Typography>
-        {self && (
+        {self && !isLearnXUser(userId) && (
           <div className={classes.buttons}>
             <Button variant="contained" onClick={handlePasswordEditOpen}>
               更改密码
