@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import useUserSession from "./useUserSession";
-import { getUserAttributes } from "apis/cognito";
+import { getUserId } from "apis/cognito";
 
 const useUserId = () => {
   const { user } = useUserSession();
@@ -10,8 +10,8 @@ const useUserId = () => {
   useEffect(() => {
     (async () => {
       if (user) {
-        const result = await getUserAttributes(user);
-        setUserId(result.find((v) => v.getName() === "sub")?.getValue());
+        const userId = await getUserId(user);
+        setUserId(userId);
       }
     })();
   }, [user]);

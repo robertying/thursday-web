@@ -22,7 +22,7 @@ import { GET_TOPIC_POSTS, GET_TOPIC_POSTS_BY_TAGS } from "apis/topic_post";
 import { initializeApollo } from "apis/client";
 import useUserId from "lib/useUserId";
 import { GET_USER } from "apis/user";
-import { getUserSession } from "apis/cognito";
+import { getUserId, getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -168,9 +168,17 @@ const TopicPostPage: React.FC = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const { session } = await getUserSession(ctx);
+    const { session, user } = await getUserSession(ctx);
+    const userId = (await getUserId(user))!;
 
     const apolloClient = initializeApollo(null, session);
+
+    await apolloClient.query<GetUser, GetUserVariables>({
+      query: GET_USER,
+      variables: {
+        id: userId,
+      },
+    });
 
     const { tag } = ctx.query;
     const tags = Array.isArray(tag) ? tag : [tag];

@@ -70,7 +70,7 @@ import useUserId from "lib/useUserId";
 import { isDesktopSafari, isMobile } from "lib/platform";
 import useBeforeReload from "lib/useBeforeReload";
 import { isLearnXUser } from "lib/learnx";
-import { getUserSession } from "apis/cognito";
+import { getUserId, getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -675,9 +675,17 @@ const PostPage: React.FC = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const { session } = await getUserSession(ctx);
+    const { session, user } = await getUserSession(ctx);
+    const userId = (await getUserId(user))!;
 
     const apolloClient = initializeApollo(null, session);
+
+    await apolloClient.query<GetUser, GetUserVariables>({
+      query: GET_USER,
+      variables: {
+        id: userId,
+      },
+    });
 
     const result = await apolloClient.query<GetPost, GetPostVariables>({
       query: GET_POST,

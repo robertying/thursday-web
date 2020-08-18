@@ -238,6 +238,17 @@ export const getUserAttributes = (user: CognitoUser) => {
   });
 };
 
+export const getUserId = (user: CognitoUser) => {
+  return new Promise<string | undefined>(async (resolve, reject) => {
+    try {
+      const result = await getUserAttributes(user);
+      return resolve(result.find((v) => v.getName() === "sub")?.getValue());
+    } catch (e) {
+      return reject(e);
+    }
+  });
+};
+
 export const changePassword = (oldPassword: string, newPassword: string) => {
   return new Promise(async (resolve, reject) => {
     try {

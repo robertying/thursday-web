@@ -19,7 +19,7 @@ import { initializeApollo } from "apis/client";
 import useUserId from "lib/useUserId";
 import { GET_USER } from "apis/user";
 import FloatingActions from "components/FloatingActions";
-import { getUserSession } from "apis/cognito";
+import { getUserId, getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -131,13 +131,22 @@ const TopicPage: React.FC = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const { session } = await getUserSession(ctx);
+    const { session, user } = await getUserSession(ctx);
+    const userId = (await getUserId(user))!;
 
     const apolloClient = initializeApollo(null, session);
 
-    await apolloClient.query<GetTopics>({
-      query: GET_TOPICS,
-    });
+    await Promise.all([
+      apolloClient.query<GetUser, GetUserVariables>({
+        query: GET_USER,
+        variables: {
+          id: userId,
+        },
+      }),
+      apolloClient.query<GetTopics>({
+        query: GET_TOPICS,
+      }),
+    ]);
 
     return {
       props: {

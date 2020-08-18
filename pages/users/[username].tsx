@@ -48,7 +48,12 @@ import dayjs from "dayjs";
 import useUserId from "lib/useUserId";
 import Upload from "components/Upload";
 import Avatar from "components/Avatar";
-import { changePassword, getUserSession, signOut } from "apis/cognito";
+import {
+  changePassword,
+  getUserId,
+  getUserSession,
+  signOut,
+} from "apis/cognito";
 import { validatePassword } from "lib/validate";
 import { isLearnXUser } from "lib/learnx";
 
@@ -439,9 +444,17 @@ const ProfilePage: React.FC = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const { session } = await getUserSession(ctx);
+    const { session, user } = await getUserSession(ctx);
+    const userId = (await getUserId(user))!;
 
     const apolloClient = initializeApollo(null, session);
+
+    await apolloClient.query<GetUser, GetUserVariables>({
+      query: GET_USER,
+      variables: {
+        id: userId,
+      },
+    });
 
     const result = await apolloClient.query<
       GetUserProfile,
