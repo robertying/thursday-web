@@ -1,4 +1,4 @@
-import { Node } from "slate";
+import { Editor, Node } from "slate";
 
 export const getPlainText = (value: Node[]) => {
   return value.map((n) => Node.string(n)).join("\n");
@@ -43,3 +43,9 @@ export const getEmptyValue = () => [
     children: [{ text: "" }],
   },
 ];
+
+export const resetSelection = (editor: Editor) =>
+  (editor.selection = {
+    anchor: { path: [0, 0], offset: 0 },
+    focus: { path: [0, 0], offset: 0 },
+  });

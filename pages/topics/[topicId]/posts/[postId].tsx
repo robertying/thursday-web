@@ -23,13 +23,13 @@ import { useQuery, useMutation, useLazyQuery } from "@apollo/client";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
-import { Node } from "slate";
+import { Editor, Node } from "slate";
 import Post from "components/Post";
 import Comment from "components/Comment";
 import Layout from "components/Layout";
 import FloatingActions from "components/FloatingActions";
 import Reply from "components/Reply";
-import Editor from "components/Editor";
+import MyEditor from "components/Editor";
 import Avatar from "components/Avatar";
 import {
   GetPost,
@@ -64,6 +64,7 @@ import {
   deserialize,
   getPlainText,
   getEmptyValue,
+  resetSelection,
 } from "lib/slatejs";
 import useUserId from "lib/useUserId";
 import { isDesktopSafari, isMobile } from "lib/platform";
@@ -361,6 +362,7 @@ const PostPage: React.FC = () => {
   const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
   const [value, setValue] = useState<Node[]>(getEmptyValue());
   const [plainValue, setPlainValue] = useState("");
+  const [editor, setEditor] = useState<Editor | null>(null);
 
   const handleEditClick = () => {
     setEditDialogOpen(true);
@@ -371,6 +373,7 @@ const PostPage: React.FC = () => {
     setEditingCommentId(null);
     setEditingReplyId(null);
     setReplyToCommentId(null);
+    editor && resetSelection(editor);
     setValue(getEmptyValue());
     setPlainValue("");
   };
@@ -618,12 +621,13 @@ const PostPage: React.FC = () => {
             </a>{" "}
             知识共享许可协议进行；你也可以单独声明其他类型的许可协议。
           </DialogContentText>
-          <Editor
+          <MyEditor
             compact
             value={value}
             plainTextValue={plainValue}
             onChange={setValue}
             onPlainTextChange={setPlainValue}
+            getEditor={(editor) => setEditor(editor)}
           />
         </DialogContent>
         {!fullScreen && (

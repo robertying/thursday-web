@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import { createEditor, Node, Transforms, Editor } from "slate";
 import {
   withReact,
@@ -83,6 +83,7 @@ export interface MyEditorProps {
   readonly?: boolean;
   onChange?: (value: Node[]) => void;
   onPlainTextChange?: (value: string) => void;
+  getEditor?: (editor: Editor) => void;
   compact?: boolean;
 }
 
@@ -93,6 +94,7 @@ const MyEditor: React.FC<MyEditorProps> = ({
   readonly,
   onChange,
   onPlainTextChange,
+  getEditor,
   compact,
 }) => {
   const classes = useStyles({
@@ -111,6 +113,10 @@ const MyEditor: React.FC<MyEditorProps> = ({
       ),
     []
   );
+
+  useEffect(() => {
+    getEditor?.(editor);
+  }, [editor]);
 
   const [readOnly, setReadOnly] = useState(false);
 
