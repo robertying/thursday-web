@@ -34,7 +34,7 @@ import {
 } from "@material-ui/icons";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation, useLazyQuery } from "@apollo/client";
 import {
   GetActivities,
   GetActivitiesVariables,
@@ -120,14 +120,13 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [message, setMessage] = useState("");
 
-  const { data, loading, refetch } = useQuery<
+  const [getActivities, { data, loading, refetch }] = useLazyQuery<
     GetActivities,
     GetActivitiesVariables
   >(GET_ACTIVITIES, {
     variables: {
       user_id: userId!,
     },
-    skip: !userId || isLearnXUser(userId),
   });
   const [markActivityRead] = useMutation<
     MarkActivityRead,
@@ -142,6 +141,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     setAnchorEl(e.currentTarget);
+    if (userId && !isLearnXUser(userId)) {
+      getActivities();
+    }
   };
 
   const handleActivityClose = () => {
@@ -157,19 +159,22 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   };
 
   useEffect(() => {
-    (async () => {
-      if (anchorEl && userId) {
-        if (data?.activity[0]?.created_at) {
+    if (data) {
+      setTimeout(async () => {
+        if (
+          data?.activity[0]?.created_at &&
+          data?.activity.some((a) => !a.read)
+        ) {
           await markActivityRead({
             variables: {
               before: data?.activity[0]?.created_at,
             },
           });
+          await refetch?.();
         }
-        await refetch();
-      }
-    })();
-  }, [anchorEl, userId]);
+      }, 1000);
+    }
+  }, [data]);
 
   return (
     <>
