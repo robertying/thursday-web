@@ -512,7 +512,8 @@ const PostPage: React.FC = () => {
               {...comment}
               onReact={handleReactComment}
               onEdit={
-                comment.author.username === userData?.user_by_pk?.username
+                comment.author.username === userData?.user_by_pk?.username &&
+                !isLearnXUser(userId)
                   ? () => {
                       setValue(deserialize(comment.content));
                       setPlainValue(getPlainText(deserialize(comment.content)));
@@ -527,10 +528,6 @@ const PostPage: React.FC = () => {
                 handleReplyModalOpen();
               }}
               onReply={() => {
-                if (isLearnXUser(userId)) {
-                  setMessage("你无法这么做，请注册正式账号");
-                  return;
-                }
                 setReplyToCommentId(comment.id);
                 handleEditClick();
               }}
@@ -556,7 +553,8 @@ const PostPage: React.FC = () => {
               key={reply.id}
               {...reply}
               onEdit={
-                reply.author.username === userData?.user_by_pk?.username
+                reply.author.username === userData?.user_by_pk?.username &&
+                !isLearnXUser(userId)
                   ? () => {
                       setValue(deserialize(reply.content));
                       setPlainValue(getPlainText(deserialize(reply.content)));
@@ -570,10 +568,7 @@ const PostPage: React.FC = () => {
           ))}
         </DialogContent>
       </Dialog>
-      <FloatingActions
-        comment={!isLearnXUser(userId)}
-        onCommentClick={handleEditClick}
-      />
+      <FloatingActions comment onCommentClick={handleEditClick} />
       <Dialog
         open={editDialogOpen}
         onClose={handleEditClose}
