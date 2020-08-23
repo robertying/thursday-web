@@ -1,0 +1,30 @@
+{
+  "name": "native",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@babel/core": "^7.11.4",
+    "@types/react-native": "^0.63.8",
+    "babel-preset-expo": "^8.2.3",
+    "expo": "^38.0.9",
+    "expo-splash-screen": "^0.5.0",
+    "expo-status-bar": "^1.0.2",
+    "expo-updates": "^0.2.14",
+    "jest-expo": "^38.0.2",
+    "react-native": "^0.63.2",
+    "react-native-gesture-handler": "^1.7.0",
+    "react-native-reanimated": "^1.13.0",
+    "react-native-screens": "^2.10.1",
+    "react-native-unimodules": "^0.10.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

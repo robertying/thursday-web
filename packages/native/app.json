@@ -1,0 +1,12 @@
+{
+  "name": "thursday",
+  "displayName": "thursday",
+  "expo": {
+    "name": "thursday",
+    "slug": "thursday",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
