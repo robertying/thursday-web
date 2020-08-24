@@ -1,0 +1,12 @@
+{
+  "presets": ["babel-preset-expo"],
+  "plugins": [
+    [
+      "react-native-dom-webview/babel",
+      {
+        "packagerPort": 8081
+      }
+    ],
+    "preval"
+  ]
+}

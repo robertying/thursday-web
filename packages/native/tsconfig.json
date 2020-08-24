@@ -8,5 +8,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "strict": true
-  }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "dom-env.d.ts"],
+  "exclude": ["node_modules"]
 }
