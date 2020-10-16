@@ -174,7 +174,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         }
       }, 1000);
     }
-  }, [data]);
+  }, [data, markActivityRead, refetch]);
 
   return (
     <>

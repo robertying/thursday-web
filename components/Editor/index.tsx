@@ -116,7 +116,7 @@ const MyEditor: React.FC<MyEditorProps> = ({
 
   useEffect(() => {
     getEditor?.(editor);
-  }, [editor]);
+  }, [editor, getEditor]);
 
   const [readOnly, setReadOnly] = useState(false);
 

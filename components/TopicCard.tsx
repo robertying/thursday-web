@@ -61,12 +61,12 @@ const TopicCard: React.FC<GetTopics_category_topics> = ({ name, posts }) => {
                       alt={post.author.username}
                       src={post.author.avatar_url ?? undefined}
                     />
-                    {post.comments.map((comment) => {
+                    {post.comments.map((comment) => (
                       <Avatar
                         alt={comment.author.username}
                         src={comment.author.avatar_url ?? undefined}
-                      />;
-                    })}
+                      />
+                    ))}
                   </AvatarGroup>
                 </Grid>
               </Grid>

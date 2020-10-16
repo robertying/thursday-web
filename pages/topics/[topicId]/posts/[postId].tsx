@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Container,
   Dialog,
@@ -204,6 +204,18 @@ const PostPage: React.FC = () => {
     await refetch();
   };
 
+  const [editor, setEditor] = useState<Editor | null>(null);
+
+  const handleEditClose = useCallback(() => {
+    setEditDialogOpen(false);
+    setEditingCommentId(null);
+    setEditingReplyId(null);
+    setReplyToCommentId(null);
+    editor && resetSelection(editor);
+    setValue(getEmptyValue());
+    setPlainValue("");
+  }, [editor]);
+
   /**
    * comment
    */
@@ -236,7 +248,7 @@ const PostPage: React.FC = () => {
         );
       })();
     }
-  }, [addCommentData]);
+  }, [addCommentData, handleEditClose, refetch, router]);
 
   useEffect(() => {
     if (updateCommentData) {
@@ -250,7 +262,7 @@ const PostPage: React.FC = () => {
         );
       })();
     }
-  }, [updateCommentData]);
+  }, [handleEditClose, refetch, router, updateCommentData]);
 
   useEffect(() => {
     if (addCommentError) {
@@ -304,7 +316,7 @@ const PostPage: React.FC = () => {
         },
       });
     }
-  }, [replyModalVisible, replyToCommentId]);
+  }, [getReplies, replyModalVisible, replyToCommentId]);
 
   useEffect(() => {
     if (addReplyData) {
@@ -319,7 +331,7 @@ const PostPage: React.FC = () => {
         );
       })();
     }
-  }, [addReplyData]);
+  }, [addReplyData, handleEditClose, refetch, router]);
 
   useEffect(() => {
     if (updateReplyData) {
@@ -334,7 +346,7 @@ const PostPage: React.FC = () => {
         );
       })();
     }
-  }, [updateReplyData]);
+  }, [handleEditClose, refetch, router, updateReplyData]);
 
   useEffect(() => {
     if (addReplyError) {
@@ -362,20 +374,9 @@ const PostPage: React.FC = () => {
   const [editingReplyId, setEditingReplyId] = useState<number | null>(null);
   const [value, setValue] = useState<Node[]>(getEmptyValue());
   const [plainValue, setPlainValue] = useState("");
-  const [editor, setEditor] = useState<Editor | null>(null);
 
   const handleEditClick = () => {
     setEditDialogOpen(true);
-  };
-
-  const handleEditClose = () => {
-    setEditDialogOpen(false);
-    setEditingCommentId(null);
-    setEditingReplyId(null);
-    setReplyToCommentId(null);
-    editor && resetSelection(editor);
-    setValue(getEmptyValue());
-    setPlainValue("");
   };
 
   const handleEdit = async () => {

@@ -114,7 +114,7 @@ const EditPage: React.FC<EditPageProps> = ({ topic }) => {
         },
       });
     }
-  }, []);
+  }, [router, topic]);
 
   const authorId = useUserId();
 

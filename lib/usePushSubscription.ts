@@ -64,14 +64,14 @@ const usePushSubscription = (
         return setPushEnabled(true);
       }
     },
-    [userId]
+    [updatePushSubscription, userId]
   );
 
   useEffect(() => {
     subscribe(true)
       .then()
       .catch(() => {});
-  }, [userId]);
+  }, [subscribe, userId]);
 
   return [pushEnabled, subscribe] as [
     boolean,

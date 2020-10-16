@@ -121,7 +121,7 @@ const ForgotPage: React.FC = () => {
 
   useEffect(() => {
     router.prefetch("/login");
-  }, []);
+  }, [router]);
 
   const [resendButtonDisabled, setResendButtonDisabled] = useState(false);
 

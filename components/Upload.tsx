@@ -166,6 +166,7 @@ const Upload: React.FC<UploadProps> = ({
             ref={imgRef}
             className={`${classes.image} ${classes.loading}`}
             style={{ cursor: "pointer" }}
+            alt="上传图片"
           />
           {loading && <CircularProgress className={classes.loading} />}
         </label>

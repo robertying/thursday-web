@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Paper,
   TextField,
@@ -83,7 +83,7 @@ const VerifyPage: React.FC = () => {
     if (username) {
       setValues({ ...values, username });
     }
-  }, [username]);
+  }, [username, values]);
 
   useEffect(() => {
     setNeedRequest(request);
@@ -93,7 +93,7 @@ const VerifyPage: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const handleTsinghuaVerify = async () => {
+  const handleTsinghuaVerify = useCallback(async () => {
     if (tsinghua && token) {
       setLoading(true);
       try {
@@ -121,11 +121,11 @@ const VerifyPage: React.FC = () => {
         setLoading(false);
       }
     }
-  };
+  }, [router, token, tsinghua]);
 
   useEffect(() => {
     handleTsinghuaVerify();
-  }, [tsinghua, token]);
+  }, [tsinghua, token, handleTsinghuaVerify]);
 
   const handleVerify = async () => {
     if (!values.username) {
@@ -206,7 +206,7 @@ const VerifyPage: React.FC = () => {
 
   useEffect(() => {
     router.prefetch("/login");
-  }, []);
+  }, [router]);
 
   const [resendButtonDisabled, setResendButtonDisabled] = useState(false);
 

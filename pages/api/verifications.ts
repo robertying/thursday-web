@@ -48,9 +48,9 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
               Destination: {
                 ToAddresses: [tsinghuaEmail],
               },
-              TemplateData: `{ \"verificationLink\":\"${
+              TemplateData: `{ "verificationLink":"${
                 process.env.SES_VERIFICATION_LINK + token
-              }\" }`,
+              }" }`,
             },
             (err, data) => {
               if (err) {

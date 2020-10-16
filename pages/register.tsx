@@ -171,7 +171,7 @@ const RegisterPage: React.FC = () => {
 
   useEffect(() => {
     router.prefetch("/verify");
-  }, []);
+  }, [router]);
 
   const [message, setMessage] = useState<{
     text: string;

@@ -117,7 +117,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
         1000
       );
     }
-  }, [session]);
+  }, [redirect_url, router, session]);
 
   const [values, setValues] = React.useState<FormState>({
     username: "",
