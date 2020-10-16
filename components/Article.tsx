@@ -4,7 +4,7 @@ import { TypographyProps } from "@material-ui/core/Typography";
 
 export interface ArticleProps extends TypographyProps {}
 
-const Article: React.FC<ArticleProps> = props => {
+const Article: React.FC<ArticleProps> = (props) => {
   const { children, ...restProps } = props;
 
   return (
@@ -13,7 +13,7 @@ const Article: React.FC<ArticleProps> = props => {
       component="article"
       gutterBottom
       style={{
-        whiteSpace: "pre-line"
+        whiteSpace: "pre-line",
       }}
       {...restProps}
     >
