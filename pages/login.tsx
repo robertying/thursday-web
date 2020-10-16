@@ -20,6 +20,7 @@ import { animated, useTransition } from "react-spring";
 import { login } from "apis/cognito";
 import useUserSession from "lib/useUserSession";
 import useInterval from "lib/useInterval";
+import { Alert } from "@material-ui/lab";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -214,6 +215,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
   return (
     <div className={classes.root}>
       <NextSeo title="登录" />
+      <Alert severity="info">
+        星期四在 2020 年 10 月 12
+        日对账户系统进行了迁移。如果您在过去注册过星期四账号，可能需要重新注册。给您带来不便，尽请谅解。
+      </Alert>
       {loading && <LinearProgress className={classes.loading} />}
       {redirecting ? (
         <Paper className={classes.paper} component="form" elevation={8}>
