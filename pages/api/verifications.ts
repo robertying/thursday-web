@@ -1,22 +1,26 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import AWS, { CognitoIdentityServiceProvider, SES } from "aws-sdk";
+import { CognitoIdentityServiceProvider, SES } from "aws-sdk";
 import jwt from "jsonwebtoken";
 import { recaptcha } from "lib/middleware";
 import { validateEmail } from "lib/validate";
 
-const ses = new SES({ region: "us-west-2" });
-const provider = new CognitoIdentityServiceProvider();
+const ses = new SES({
+  region: "us-west-2",
+  credentials: {
+    accessKeyId: process.env.COGNITO_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.COGNITO_ACCESS_KEY_SECRET!,
+  },
+});
+const cognito = new CognitoIdentityServiceProvider({
+  region: "ap-northeast-1",
+  credentials: {
+    accessKeyId: process.env.COGNITO_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.COGNITO_ACCESS_KEY_SECRET!,
+  },
+});
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
   return new Promise(async (resolve) => {
-    AWS.config.update({
-      region: "ap-northeast-1",
-      credentials: {
-        accessKeyId: process.env.COGNITO_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.COGNITO_ACCESS_KEY_SECRET!,
-      },
-    });
-
     const { action, username, tsinghuaEmail } = req.body;
 
     if (action === "request") {
@@ -99,7 +103,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
           }
 
           try {
-            provider.adminUpdateUserAttributes(
+            cognito.adminUpdateUserAttributes(
               {
                 UserAttributes: [
                   {

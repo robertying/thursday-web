@@ -13,6 +13,14 @@ import {
   GetLearnXPushTokensVariables,
 } from "apis/types";
 
+AWS.config.update({
+  region: "ap-northeast-1",
+  credentials: {
+    accessKeyId: process.env.KMS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.KMS_ACCESS_KEY_SECRET!,
+  },
+});
+
 const { encrypt, decrypt } = buildClient();
 
 const keyring = new KmsKeyringNode({ generatorKeyId: process.env.KMS_KEY_ARN });
@@ -39,14 +47,6 @@ export default (req: any, res: any) => {
       >(GET_LEARNX_PUSH_TOKENS, { user_id: req.auth.sub });
 
       const tokens = JSON.parse(response.learnx_push_by_pk?.tokens ?? "{}");
-
-      AWS.config.update({
-        region: "ap-northeast-1",
-        credentials: {
-          accessKeyId: process.env.KMS_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.KMS_ACCESS_KEY_SECRET!,
-        },
-      });
 
       const { result: usernameResult } = await encrypt(keyring, username, {
         encryptionContext: context,
