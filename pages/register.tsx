@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-
 import {
   Paper,
   TextField,
@@ -81,7 +80,7 @@ const RegisterPage: React.FC = () => {
 
   const router = useRouter();
 
-  const [values, setValues] = React.useState<FormState>({
+  const [values, setValues] = useState<FormState>({
     email: "",
     username: "",
     password: "",

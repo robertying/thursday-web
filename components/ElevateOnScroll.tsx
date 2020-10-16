@@ -1,3 +1,4 @@
+import { cloneElement } from "react";
 import { useScrollTrigger } from "@material-ui/core";
 
 export interface ElevateOnScrollProps {
@@ -12,7 +13,7 @@ const ElevateOnScroll: React.FC<ElevateOnScrollProps> = (props) => {
     threshold: props.threshold ?? 0,
   });
 
-  return React.cloneElement(props.children, {
+  return cloneElement(props.children, {
     elevation: trigger ? 4 : 0,
   });
 };

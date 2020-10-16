@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import {
   Paper,
   TextField,
@@ -65,7 +64,7 @@ const ForgotPage: React.FC = () => {
 
   const router = useRouter();
 
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     username: "",
     code: "",
     password: "",

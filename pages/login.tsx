@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import {
   Paper,
   TextField,
@@ -120,7 +119,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
     }
   }, [redirect_url, router, session]);
 
-  const [values, setValues] = React.useState<FormState>({
+  const [values, setValues] = useState<FormState>({
     username: "",
     password: "",
     showPassword: false,

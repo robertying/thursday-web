@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-
 import {
   Paper,
   TextField,
@@ -72,7 +71,7 @@ const VerifyPage: React.FC = () => {
   const token = router.query.token as string | undefined;
   const request = router.query.request === "true";
 
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     username: "",
     tsinghuaEmail: "",
     code: "",
