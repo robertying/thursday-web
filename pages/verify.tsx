@@ -7,6 +7,7 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
+import { ToggleButton, ToggleButtonGroup } from "@material-ui/lab";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
@@ -227,6 +228,10 @@ const VerifyPage: React.FC = () => {
     setTimeout(() => setResendButtonDisabled(false), 30 * 1000);
   };
 
+  const [tsinghuaVerifyMethod, setTsinghuaVerifyMethod] = useState<
+    "email" | "learnx"
+  >("learnx");
+
   const [message, setMessage] = useState<{
     text: string;
     duration?: number | null;
@@ -289,21 +294,39 @@ const VerifyPage: React.FC = () => {
             />
             {tsinghua && (
               <>
-                <TextField
-                  label="清华邮箱"
-                  helperText="需要后缀为 tsinghua.edu.cn 或 tsinghua.org.cn 的邮箱；清华邮箱仅用作一次性验证，后端只保存验证时间，不保存邮箱地址"
-                  type="email"
-                  autoComplete="email"
-                  fullWidth
-                  value={values.tsinghuaEmail}
-                  onChange={(e) =>
-                    setValues({ ...values, tsinghuaEmail: e.target.value })
-                  }
-                />
-                <ReCAPTCHA
-                  ref={recaptchaRef}
-                  sitekey="6LfusMkUAAAAAJRl9ZXEMuetPe5eX9lqVkjvaOqv"
-                />
+                <ToggleButtonGroup
+                  value={tsinghuaVerifyMethod}
+                  exclusive
+                  onChange={(e, v) => setTsinghuaVerifyMethod(v)}
+                >
+                  <ToggleButton value="learnx">
+                    通过 learnX App 验证
+                  </ToggleButton>
+                  <ToggleButton value="email">通过清华邮箱验证</ToggleButton>
+                </ToggleButtonGroup>
+                {tsinghuaVerifyMethod === "learnx" ? (
+                  <a href={`learnx://auth/verify?username=${values.username}`}>
+                    <Button variant="outlined">打开 learnX</Button>
+                  </a>
+                ) : (
+                  <>
+                    <TextField
+                      label="清华邮箱"
+                      helperText="需要后缀为 tsinghua.edu.cn 或 tsinghua.org.cn 的邮箱；清华邮箱仅用作一次性验证，后端只保存验证时间，不保存邮箱地址"
+                      type="email"
+                      autoComplete="email"
+                      fullWidth
+                      value={values.tsinghuaEmail}
+                      onChange={(e) =>
+                        setValues({ ...values, tsinghuaEmail: e.target.value })
+                      }
+                    />
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                    />
+                  </>
+                )}
               </>
             )}
             {!tsinghua && (
