@@ -9,6 +9,14 @@ const provider = new CognitoIdentityServiceProvider();
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
   return new Promise(async (resolve) => {
+    AWS.config.update({
+      region: "ap-northeast-1",
+      credentials: {
+        accessKeyId: process.env.COGNITO_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.COGNITO_ACCESS_KEY_SECRET!,
+      },
+    });
+
     const { action, username, tsinghuaEmail } = req.body;
 
     if (action === "request") {
@@ -91,14 +99,6 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
           }
 
           try {
-            AWS.config.update({
-              region: "ap-northeast-1",
-              credentials: {
-                accessKeyId: process.env.COGNITO_ACCESS_KEY_ID!,
-                secretAccessKey: process.env.COGNITO_ACCESS_KEY_SECRET!,
-              },
-            });
-
             provider.adminUpdateUserAttributes(
               {
                 UserAttributes: [
