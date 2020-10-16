@@ -1,5 +1,3 @@
-import React from "react";
-
 const Picture: React.FC<React.DetailedHTMLProps<
   React.ImgHTMLAttributes<HTMLImageElement>,
   HTMLImageElement
