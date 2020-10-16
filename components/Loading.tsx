@@ -24,7 +24,7 @@ const Loading = () => {
   const [loading, setLoading] = useState(false);
 
   const handleStart = (url: string) => {
-    if (isWeChatBrowser()) {
+    if (isWeChatBrowser() && !url.includes("redirect_url")) {
       window.location.href = url;
     } else {
       setLoading(true);
