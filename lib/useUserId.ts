@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import useUserSession from "./useUserSession";
 import { getUserId } from "apis/cognito";
+import useUserSession from "./useUserSession";
 
 const useUserId = () => {
   const { user } = useUserSession();

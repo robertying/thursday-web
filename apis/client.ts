@@ -1,17 +1,16 @@
+import { useMemo } from "react";
 import {
   ApolloClient,
   InMemoryCache,
   NormalizedCacheObject,
   createHttpLink,
   HttpLink,
-  ApolloLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
-import { useMemo } from "react";
 import { CognitoUserSession } from "amazon-cognito-identity-js";
 import { getUserSession } from "./cognito";
 
-let apolloClient: ApolloClient<NormalizedCacheObject>;
+let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;
 
 const httpLink = createHttpLink({
   uri: `${process.env.NEXT_PUBLIC_API_URL}/v1/graphql`,
@@ -32,26 +31,18 @@ const authLink = setContext(async (_, { headers }) => {
   };
 });
 
-function createApolloClient(session?: CognitoUserSession) {
-  let link: ApolloLink | null;
+const clientLink = authLink.concat(httpLink);
+const serverLink = new HttpLink({
+  uri: `${process.env.API_URL}/v1/graphql`,
+  headers: {
+    "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
+  },
+});
 
-  if (typeof window === "undefined") {
-    const token = session?.getIdToken().getJwtToken();
-    link = new HttpLink({
-      uri: `${process.env.API_URL}/v1/graphql`,
-      headers: token
-        ? {
-            Authorization: "Bearer " + token,
-          }
-        : undefined,
-    });
-  } else {
-    link = authLink.concat(httpLink);
-  }
-
+function createApolloClient() {
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
-    link,
+    link: typeof window === "undefined" ? serverLink : clientLink,
     cache: new InMemoryCache({
       typePolicies: {
         user: {
@@ -63,13 +54,13 @@ function createApolloClient(session?: CognitoUserSession) {
 }
 
 export function initializeApollo(
-  initialState: NormalizedCacheObject | null = null,
-  session?: CognitoUserSession
+  initialState: NormalizedCacheObject | null = null
 ) {
-  const _apolloClient = apolloClient ?? createApolloClient(session);
+  const _apolloClient = apolloClient ?? createApolloClient();
 
   if (initialState) {
-    _apolloClient.cache.restore(initialState);
+    const existingCache = _apolloClient.extract();
+    _apolloClient.cache.restore({ ...existingCache, ...initialState });
   }
 
   if (typeof window === "undefined") return _apolloClient;

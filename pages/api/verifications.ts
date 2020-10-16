@@ -4,14 +4,6 @@ import jwt from "jsonwebtoken";
 import { recaptcha } from "lib/middleware";
 import { validateEmail } from "lib/validate";
 
-AWS.config.update({
-  region: "ap-northeast-1",
-  credentials: {
-    accessKeyId: process.env.COGNITO_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.COGNITO_ACCESS_KEY_SECRET!,
-  },
-});
-
 const ses = new SES({ region: "us-west-2" });
 const provider = new CognitoIdentityServiceProvider();
 
@@ -99,6 +91,14 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
           }
 
           try {
+            AWS.config.update({
+              region: "ap-northeast-1",
+              credentials: {
+                accessKeyId: process.env.COGNITO_ACCESS_KEY_ID!,
+                secretAccessKey: process.env.COGNITO_ACCESS_KEY_SECRET!,
+              },
+            });
+
             provider.adminUpdateUserAttributes(
               {
                 UserAttributes: [

@@ -9,6 +9,7 @@ export class UniversalStorage {
   path = "/";
   expires = 365;
   secure = true;
+  sameSite = "lax";
 
   constructor(
     data: {
@@ -16,6 +17,7 @@ export class UniversalStorage {
       path?: string;
       expires?: number;
       secure?: boolean;
+      sameSite?: "none" | "lax" | "strict";
     },
     ctx?: GetServerSidePropsContext<ParsedUrlQuery>
   ) {
@@ -24,6 +26,7 @@ export class UniversalStorage {
     this.path = data.path ?? "/";
     this.expires = data.expires ?? 365;
     this.secure = data.secure ?? true;
+    this.sameSite = data.sameSite ?? "lax";
   }
 
   setItem(key: string, value: string) {
@@ -32,6 +35,7 @@ export class UniversalStorage {
       expires: dayjs().add(this.expires, "day").toDate(),
       path: this.path,
       secure: this.secure,
+      sameSite: this.sameSite,
     });
     return this.getItem(key);
   }

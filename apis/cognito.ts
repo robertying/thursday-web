@@ -22,6 +22,7 @@ const clientUserPool = new CognitoUserPool({
   Storage: new UniversalStorage({
     domain,
     secure,
+    sameSite: "strict",
   }),
 });
 export const getUserPool = (ctx?: Context) => {
@@ -35,6 +36,7 @@ export const getUserPool = (ctx?: Context) => {
       {
         domain,
         secure,
+        sameSite: "strict",
       },
       ctx
     ),
@@ -211,8 +213,11 @@ export const getUserSession = (ctx?: Context) => {
       return reject(null);
     }
 
-    cognitoUser.getSession(function (err: Error, session: CognitoUserSession) {
-      if (err) {
+    cognitoUser.getSession(function (
+      err: Error,
+      session: CognitoUserSession | null
+    ) {
+      if (err || !session) {
         return reject(err);
       }
 
@@ -223,8 +228,8 @@ export const getUserSession = (ctx?: Context) => {
 
 export const getUserAttributes = (user: CognitoUser) => {
   return new Promise<CognitoUserAttribute[]>((resolve, reject) => {
-    user.getSession(function (err: Error, session: CognitoUserSession) {
-      if (err) {
+    user.getSession(function (err: Error, session: CognitoUserSession | null) {
+      if (err || !session) {
         return reject(err);
       }
 

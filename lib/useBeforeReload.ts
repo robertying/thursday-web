@@ -1,17 +1,18 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 const useBeforeReload = (enabled: boolean) => {
-  const listener = useCallback((e: BeforeUnloadEvent) => {
-    e.preventDefault();
-    e.returnValue = "";
-  }, []);
-
   useEffect(() => {
+    const listener = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
     if (enabled) {
       window.addEventListener("beforeunload", listener);
     } else {
       window.removeEventListener("beforeunload", listener);
     }
+
     return () => window.removeEventListener("beforeunload", listener);
   }, [enabled]);
 };
