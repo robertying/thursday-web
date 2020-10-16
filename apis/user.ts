@@ -86,7 +86,6 @@ export const UPDATE_PUSH_SUBSCRIPTION = gql`
       _set: { web_push_subscription: $web_push_subscription }
     ) {
       username
-      web_push_enabled
     }
   }
 `;

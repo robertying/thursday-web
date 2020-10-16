@@ -2,6 +2,7 @@ import { URLSearchParams } from "url";
 import jwt from "jsonwebtoken";
 import jwksClient from "jwks-rsa";
 import CORS, { CorsOptions } from "cors";
+import { CognitoUserSession } from "amazon-cognito-identity-js";
 import { getUserSession } from "apis/cognito";
 
 const client = jwksClient({
@@ -67,13 +68,22 @@ export const recaptcha = async (req: any, res: any, next: any) => {
 };
 
 export const auth = async (req: any, res: any, next: any) => {
-  const { session } = await getUserSession({ req } as any);
-  const token = session?.getIdToken().getJwtToken();
-  if (!token) {
-    return res.status(401).send("401 Unauthorized: Missing token");
+  let session: CognitoUserSession | null = null;
+
+  try {
+    const results = await getUserSession({ req } as any);
+    session = results.session;
+  } catch (err) {
+    console.error(err);
+    res.status(401).end();
   }
 
   try {
+    const token = session?.getIdToken().getJwtToken();
+    if (!token) {
+      return res.status(401).send("401 Unauthorized: Missing token");
+    }
+
     const decoded = jwt.decode(token, { complete: true }) as any;
     if (!decoded) {
       return res.status(401).send("401 Unauthorized: Invalid token");
@@ -91,13 +101,15 @@ export const auth = async (req: any, res: any, next: any) => {
       }
       const signingKey = key.getPublicKey();
 
-      jwt.verify(token, signingKey, (err, decoded) => {
-        if (err || !decoded) {
+      jwt.verify(token, signingKey, (err, d) => {
+        if (err || !d) {
           console.error(err);
           return res
             .status(401)
             .send("401 Unauthorized: Token expired or invalid");
         }
+
+        req.auth = decoded.payload;
         return next();
       });
     });

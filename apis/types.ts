@@ -348,6 +348,60 @@ export interface GetNewestPosts {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL query operation: GetLearnXPushTokens
+// ====================================================
+
+export interface GetLearnXPushTokens_learnx_push_by_pk {
+  __typename: "learnx_push";
+  user_id: uuid;
+  tokens: string | null;
+}
+
+export interface GetLearnXPushTokens {
+  /**
+   * fetch data from the table: "learnx_push" using primary key columns
+   */
+  learnx_push_by_pk: GetLearnXPushTokens_learnx_push_by_pk | null;
+}
+
+export interface GetLearnXPushTokensVariables {
+  user_id: uuid;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: AddLearnXPushDevice
+// ====================================================
+
+export interface AddLearnXPushDevice_insert_learnx_push_one {
+  __typename: "learnx_push";
+  user_id: uuid;
+}
+
+export interface AddLearnXPushDevice {
+  /**
+   * insert a single row into the table: "learnx_push"
+   */
+  insert_learnx_push_one: AddLearnXPushDevice_insert_learnx_push_one | null;
+}
+
+export interface AddLearnXPushDeviceVariables {
+  user_id: uuid;
+  username: string;
+  password: string;
+  tokens: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: GetPost
 // ====================================================
 
@@ -1211,10 +1265,6 @@ export interface UpdateUserStatusVariables {
 export interface UpdatePushSubscription_update_user_by_pk {
   __typename: "user";
   username: string;
-  /**
-   * A computed field, executes function "user_web_push_enabled"
-   */
-  web_push_enabled: boolean | null;
 }
 
 export interface UpdatePushSubscription {
@@ -1237,6 +1287,26 @@ export interface UpdatePushSubscriptionVariables {
 //==============================================================
 // START Enums and Input Objects
 //==============================================================
+
+/**
+ * unique or primary key constraints on table "activity"
+ */
+export enum activity_constraint {
+  activity_pkey = "activity_pkey",
+}
+
+/**
+ * update columns of table "activity"
+ */
+export enum activity_update_column {
+  comment_id = "comment_id",
+  created_at = "created_at",
+  id = "id",
+  read = "read",
+  reply_id = "reply_id",
+  updated_at = "updated_at",
+  user_id = "user_id",
+}
 
 /**
  * unique or primary key constraints on table "category"
@@ -1466,7 +1536,6 @@ export enum topic_update_column {
  */
 export enum user_constraint {
   user_pkey = "user_pkey",
-  user_username_key = "user_username_key",
 }
 
 /**
@@ -1532,6 +1601,58 @@ export interface String_comparison_exp {
   _nlike?: string | null;
   _nsimilar?: string | null;
   _similar?: string | null;
+}
+
+/**
+ * input type for inserting array relation for remote table "activity"
+ */
+export interface activity_arr_rel_insert_input {
+  data: activity_insert_input[];
+  on_conflict?: activity_on_conflict | null;
+}
+
+/**
+ * Boolean expression to filter rows from the table "activity". All fields are combined with a logical 'AND'.
+ */
+export interface activity_bool_exp {
+  _and?: (activity_bool_exp | null)[] | null;
+  _not?: activity_bool_exp | null;
+  _or?: (activity_bool_exp | null)[] | null;
+  comment?: comment_bool_exp | null;
+  comment_id?: Int_comparison_exp | null;
+  created_at?: timestamptz_comparison_exp | null;
+  id?: String_comparison_exp | null;
+  read?: Boolean_comparison_exp | null;
+  reply?: reply_bool_exp | null;
+  reply_id?: Int_comparison_exp | null;
+  updated_at?: timestamptz_comparison_exp | null;
+  user?: user_bool_exp | null;
+  user_id?: uuid_comparison_exp | null;
+}
+
+/**
+ * input type for inserting data into table "activity"
+ */
+export interface activity_insert_input {
+  comment?: comment_obj_rel_insert_input | null;
+  comment_id?: number | null;
+  created_at?: timestamptz | null;
+  id?: string | null;
+  read?: boolean | null;
+  reply?: reply_obj_rel_insert_input | null;
+  reply_id?: number | null;
+  updated_at?: timestamptz | null;
+  user?: user_obj_rel_insert_input | null;
+  user_id?: uuid | null;
+}
+
+/**
+ * on conflict condition type for table "activity"
+ */
+export interface activity_on_conflict {
+  constraint: activity_constraint;
+  update_columns: activity_update_column[];
+  where?: activity_bool_exp | null;
 }
 
 /**
@@ -2180,6 +2301,7 @@ export interface user_bool_exp {
   _and?: (user_bool_exp | null)[] | null;
   _not?: user_bool_exp | null;
   _or?: (user_bool_exp | null)[] | null;
+  activities?: activity_bool_exp | null;
   avatar_url?: String_comparison_exp | null;
   comments?: comment_bool_exp | null;
   created_at?: timestamptz_comparison_exp | null;
@@ -2197,6 +2319,7 @@ export interface user_bool_exp {
  * input type for inserting data into table "user"
  */
 export interface user_insert_input {
+  activities?: activity_arr_rel_insert_input | null;
   avatar_url?: string | null;
   comments?: comment_arr_rel_insert_input | null;
   created_at?: timestamptz | null;
