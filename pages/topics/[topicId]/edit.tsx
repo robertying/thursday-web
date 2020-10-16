@@ -43,7 +43,6 @@ import {
 } from "lib/slatejs";
 import { isDesktopSafari, isMobile } from "lib/platform";
 import useBeforeReload from "lib/useBeforeReload";
-import { getUserSession } from "apis/cognito";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -300,9 +299,7 @@ export const getServerSideProps: GetServerSideProps<EditPageProps> = async (
   ctx
 ) => {
   try {
-    const { session } = await getUserSession(ctx);
-
-    const apolloClient = initializeApollo(null, session);
+    const apolloClient = initializeApollo();
 
     const response = await apolloClient.query<
       GetTopicById,

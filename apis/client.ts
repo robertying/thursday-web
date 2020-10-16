@@ -7,7 +7,6 @@ import {
   HttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/link-context";
-import { CognitoUserSession } from "amazon-cognito-identity-js";
 import { getUserSession } from "./cognito";
 
 let apolloClient: ApolloClient<NormalizedCacheObject> | null = null;

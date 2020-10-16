@@ -131,10 +131,10 @@ const TopicPage: React.FC = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const { session, user } = await getUserSession(ctx);
+    const { user } = await getUserSession(ctx);
     const userId = (await getUserId(user))!;
 
-    const apolloClient = initializeApollo(null, session);
+    const apolloClient = initializeApollo();
 
     await Promise.all([
       apolloClient.query<GetUser, GetUserVariables>({
