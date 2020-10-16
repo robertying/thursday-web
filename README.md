@@ -1,3 +1,5 @@
-# 星期四 Thursday
+# Thursday
+
+星期四社区
 
 [thu.community](https://thu.community)
