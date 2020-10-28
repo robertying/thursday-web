@@ -156,7 +156,7 @@ const sendWebPush = async (
   }
 };
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   return new Promise(async (resolve) => {
     const secret = req.headers["x-hasura-event-secret"];
     if (!secret || secret !== process.env.X_HASURA_GRAPHQL_EVENT_SECRET) {
@@ -393,3 +393,5 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     }
   });
 };
+
+export default handler;

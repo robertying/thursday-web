@@ -18,7 +18,7 @@ const policy = {
   ],
 };
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   return new Promise(async (resolve) => {
     try {
       await new Promise((resolve) => auth(req, res, resolve));
@@ -50,3 +50,5 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     }
   });
 };
+
+export default handler;

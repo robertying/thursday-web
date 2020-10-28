@@ -19,7 +19,7 @@ const cognito = new CognitoIdentityServiceProvider({
   },
 });
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   return new Promise(async (resolve) => {
     const { action, username, tsinghuaEmail } = req.body;
 
@@ -138,3 +138,5 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     }
   });
 };
+
+export default handler;

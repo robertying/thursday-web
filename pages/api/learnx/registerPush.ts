@@ -29,7 +29,7 @@ const context = {
   identifier: process.env.KMS_ENCRPTION_IDENTIFIER!,
 };
 
-export default (req: any, res: any) => {
+const handler = (req: any, res: any) => {
   return new Promise(async (resolve) => {
     try {
       await new Promise((resolve) => auth(req, res, resolve));
@@ -90,3 +90,5 @@ export default (req: any, res: any) => {
     }
   });
 };
+
+export default handler;
