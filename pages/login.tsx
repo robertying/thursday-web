@@ -111,10 +111,23 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
   const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
+    if (redirect_url) {
+      sessionStorage.setItem("redirect_url", redirect_url as string);
+    }
+  }, [redirect_url]);
+
+  useEffect(() => {
     if (session) {
       setRedirecting(true);
+
+      const sessionRedirectUrl = sessionStorage.getItem("redirect_url");
+      sessionStorage.removeItem("redirect_url");
+
       setTimeout(
-        () => router.push((redirect_url as string | undefined) ?? "/"),
+        () =>
+          router.push(
+            (redirect_url as string | undefined) || sessionRedirectUrl || "/"
+          ),
         1000
       );
     }
@@ -161,8 +174,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
       setLoading(true);
       await login(values.username, values.password);
       setMessage("登录成功");
+
+      const sessionRedirectUrl = sessionStorage.getItem("redirect_url");
+      sessionStorage.removeItem("redirect_url");
       setTimeout(
-        () => router.push((redirect_url as string | undefined) ?? "/"),
+        () =>
+          router.push(
+            (redirect_url as string | undefined) || sessionRedirectUrl || "/"
+          ),
         1000
       );
     } catch (err) {
