@@ -63,6 +63,7 @@ const TopicCard: React.FC<GetTopics_category_topics> = ({ name, posts }) => {
                     />
                     {post.comments.map((comment) => (
                       <Avatar
+                        key={comment.id}
                         alt={comment.author.username}
                         src={comment.author.avatar_url ?? undefined}
                       />
