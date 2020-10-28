@@ -5,7 +5,6 @@ import {
   InputAdornment,
   IconButton,
   Button,
-  Avatar,
   Snackbar,
   LinearProgress,
   Typography,
@@ -15,6 +14,7 @@ import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import { NextSeo } from "next-seo";
 import { animated, useTransition } from "react-spring";
 import { login } from "apis/cognito";
@@ -226,7 +226,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
         </Paper>
       ) : (
         <Paper className={classes.paper} component="form" elevation={8}>
-          <Avatar className={classes.logo} src="/logo.png" alt="logo" />
+          <Image className={classes.logo} src="/logo.png" alt="logo" unsized />
           <Typography>星期四｜Thursday</Typography>
           <div className={classes.topic}>
             {transitions.map(({ item, key, props }) => (
