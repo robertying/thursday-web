@@ -109,8 +109,7 @@ const HomePage = () => {
               {topPostData?.post?.[0] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${topPostData?.post?.[0].topic_id}/posts/${topPostData?.post?.[0].id}`}
+                    href={`/topics/${topPostData?.post?.[0].topic_id}/posts/${topPostData?.post?.[0].id}`}
                   >
                     <a>
                       <PostCard {...topPostData?.post?.[0]} />
@@ -121,8 +120,7 @@ const HomePage = () => {
               {topPostData?.post?.[1] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${topPostData?.post?.[1].topic_id}/posts/${topPostData?.post?.[1].id}`}
+                    href={`/topics/${topPostData?.post?.[1].topic_id}/posts/${topPostData?.post?.[1].id}`}
                   >
                     <a>
                       <PostCard {...topPostData?.post?.[1]} />
@@ -135,8 +133,7 @@ const HomePage = () => {
               {topPostData?.post?.[2] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${topPostData?.post?.[2].topic_id}/posts/${topPostData?.post?.[2].id}`}
+                    href={`/topics/${topPostData?.post?.[2].topic_id}/posts/${topPostData?.post?.[2].id}`}
                   >
                     <a>
                       <PostCard {...topPostData?.post?.[2]} />
@@ -147,8 +144,7 @@ const HomePage = () => {
               {topPostData?.post?.[3] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${topPostData?.post?.[3].topic_id}/posts/${topPostData?.post?.[3].id}`}
+                    href={`/topics/${topPostData?.post?.[3].topic_id}/posts/${topPostData?.post?.[3].id}`}
                   >
                     <a>
                       <PostCard {...topPostData?.post?.[3]} />
@@ -159,8 +155,7 @@ const HomePage = () => {
               {topPostData?.post?.[4] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${topPostData?.post?.[4].topic_id}/posts/${topPostData?.post?.[4].id}`}
+                    href={`/topics/${topPostData?.post?.[4].topic_id}/posts/${topPostData?.post?.[4].id}`}
                   >
                     <a>
                       <PostCard {...topPostData?.post?.[4]} />
@@ -178,8 +173,7 @@ const HomePage = () => {
               {newestPostData?.post?.[0] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${newestPostData?.post?.[0].topic_id}/posts/${newestPostData?.post?.[0].id}`}
+                    href={`/topics/${newestPostData?.post?.[0].topic_id}/posts/${newestPostData?.post?.[0].id}`}
                   >
                     <a>
                       <PostCard {...newestPostData?.post?.[0]} />
@@ -190,8 +184,7 @@ const HomePage = () => {
               {newestPostData?.post?.[1] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${newestPostData?.post?.[1].topic_id}/posts/${newestPostData?.post?.[1].id}`}
+                    href={`/topics/${newestPostData?.post?.[1].topic_id}/posts/${newestPostData?.post?.[1].id}`}
                   >
                     <a>
                       <PostCard {...newestPostData?.post?.[1]} />
@@ -204,8 +197,7 @@ const HomePage = () => {
               {newestPostData?.post?.[2] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${newestPostData?.post?.[2].topic_id}/posts/${newestPostData?.post?.[2].id}`}
+                    href={`/topics/${newestPostData?.post?.[2].topic_id}/posts/${newestPostData?.post?.[2].id}`}
                   >
                     <a>
                       <PostCard {...newestPostData?.post?.[2]} />
@@ -216,8 +208,7 @@ const HomePage = () => {
               {newestPostData?.post?.[3] && (
                 <Grid item xs={12} sm>
                   <Link
-                    href="/topics/[topicId]/posts/[postId]"
-                    as={`/topics/${newestPostData?.post?.[3].topic_id}/posts/${newestPostData?.post?.[3].id}`}
+                    href={`/topics/${newestPostData?.post?.[3].topic_id}/posts/${newestPostData?.post?.[3].id}`}
                   >
                     <a>
                       <PostCard {...newestPostData?.post?.[3]} />

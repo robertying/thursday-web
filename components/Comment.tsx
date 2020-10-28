@@ -73,7 +73,7 @@ const Comment: React.FC<CommentProps> = ({
     <Card>
       <CardHeader
         avatar={
-          <Link href="/users/[userId]" as={`/users/${author.username}`}>
+          <Link href={`/users/${author.username}`}>
             <a>
               <Avatar
                 src={author.avatar_url ?? undefined}

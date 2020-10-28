@@ -132,10 +132,7 @@ const TopicPostPage: React.FC = () => {
         </div>
         {data?.topic?.[0].posts.map((post) => (
           <Grid item key={post.id}>
-            <Link
-              href="/topics/[topicId]/posts/[postId]"
-              as={`/topics/${topicId}/posts/${post.id}`}
-            >
+            <Link href={`/topics/${topicId}/posts/${post.id}`}>
               <a>
                 <PostCard {...post} />
               </a>

@@ -261,7 +261,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   visibility: !username ? "hidden" : "visible",
                 }}
               >
-                <Link href="/users/[username]" as={`/users/${username}`}>
+                <Link href={`/users/${username}`}>
                   <a>
                     <IconButton className={classes.avatarIcon}>
                       <Avatar
@@ -358,8 +358,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                               {" "}
                               评论了你的帖子{" "}
                               <Link
-                                href="/topics/[topicId]/posts/[postId]"
-                                as={`/topics/${activity.comment.post?.topic_id}/posts/${activity.comment.post?.id}#comment-${activity.comment.id}`}
+                                href={`/topics/${activity.comment.post?.topic_id}/posts/${activity.comment.post?.id}#comment-${activity.comment.id}`}
                               >
                                 <a>{activity.comment.post?.title}</a>
                               </Link>
@@ -370,8 +369,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                               {" "}
                               回复了你在帖子{" "}
                               <Link
-                                href="/topics/[topicId]/posts/[postId]"
-                                as={`/topics/${activity.reply.comment.post?.topic_id}/posts/${activity.reply.comment.post?.id}#comment-${activity.reply.comment.id}?reply=${activity.reply.id}`}
+                                href={`/topics/${activity.reply.comment.post?.topic_id}/posts/${activity.reply.comment.post?.id}#comment-${activity.reply.comment.id}?reply=${activity.reply.id}`}
                               >
                                 <a>{activity.reply.comment.post?.title}</a>
                               </Link>{" "}

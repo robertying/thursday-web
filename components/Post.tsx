@@ -97,7 +97,7 @@ const Post: React.FC<PostProps> = ({
       )}
       <CardHeader
         avatar={
-          <Link href="/users/[userId]" as={`/users/${author.username}`}>
+          <Link href={`/users/${author.username}`}>
             <a>
               <Avatar
                 src={author.avatar_url ?? undefined}
