@@ -80,7 +80,7 @@ const VerifyPage: React.FC = () => {
   const [needRequest, setNeedRequest] = useState(true);
 
   useEffect(() => {
-    if (username) {
+    if (username && !values.username) {
       setValues({ ...values, username });
     }
   }, [username, values]);
