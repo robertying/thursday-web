@@ -4,6 +4,8 @@ export const GET_LEARNX_PUSH_TOKENS = gql`
   query GetLearnXPushTokens($user_id: uuid!) {
     learnx_push_by_pk(user_id: $user_id) {
       user_id
+      username
+      password
       tokens
     }
   }
@@ -29,6 +31,15 @@ export const ADD_LEARNX_PUSH_DEVICE = gql`
       }
     ) {
       user_id
+    }
+  }
+`;
+
+export const DELETE_LEARNX_PUSH = gql`
+  mutation DeleteLearnXPush($user_id: uuid!) {
+    delete_learnx_push_by_pk(user_id: $user_id) {
+      user_id
+      username
     }
   }
 `;

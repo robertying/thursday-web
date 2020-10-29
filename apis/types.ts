@@ -354,6 +354,8 @@ export interface GetNewestPosts {
 export interface GetLearnXPushTokens_learnx_push_by_pk {
   __typename: "learnx_push";
   user_id: uuid;
+  username: string | null;
+  password: string | null;
   tokens: string | null;
 }
 
@@ -394,6 +396,32 @@ export interface AddLearnXPushDeviceVariables {
   username: string;
   password: string;
   tokens: string;
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// @generated
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: DeleteLearnXPush
+// ====================================================
+
+export interface DeleteLearnXPush_delete_learnx_push_by_pk {
+  __typename: "learnx_push";
+  user_id: uuid;
+  username: string | null;
+}
+
+export interface DeleteLearnXPush {
+  /**
+   * delete single row from the table: "learnx_push"
+   */
+  delete_learnx_push_by_pk: DeleteLearnXPush_delete_learnx_push_by_pk | null;
+}
+
+export interface DeleteLearnXPushVariables {
+  user_id: uuid;
 }
 
 /* tslint:disable */
