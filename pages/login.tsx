@@ -8,19 +8,16 @@ import {
   Snackbar,
   LinearProgress,
   Typography,
+  Avatar,
 } from "@material-ui/core";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
-import { GetStaticProps } from "next";
+import { Alert } from "@material-ui/lab";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import { NextSeo } from "next-seo";
-import { animated, useTransition } from "react-spring";
 import { login } from "apis/cognito";
 import useUserSession from "lib/useUserSession";
-import useInterval from "lib/useInterval";
-import { Alert } from "@material-ui/lab";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -80,27 +77,7 @@ interface FormState {
   showPassword: boolean;
 }
 
-let previousIndex = 0;
-
-export const getRandomTopic = (topics: LoginPageProps["topics"]) => {
-  const t = [...topics];
-  t.splice(previousIndex, 1);
-
-  const topic = t[Math.floor(Math.random() * t.length)];
-  previousIndex = topics.indexOf(topic);
-
-  return topic;
-};
-
-const AnimatedTypography = animated(Typography);
-
-export interface LoginPageProps {
-  topics: {
-    name: string;
-  }[];
-}
-
-const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
+const LoginPage: React.FC = () => {
   const classes = useStyles();
 
   const router = useRouter();
@@ -217,20 +194,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
     }
   };
 
-  const [topic, setTopic] = useState(topics[0]);
-  const transitions = useTransition(topic, (item) => item.name, {
-    from: {
-      position: "absolute",
-      opacity: 0,
-      left: 0,
-      right: 0,
-      margin: "0 auto",
-    },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-  });
-  useInterval(() => setTopic(getRandomTopic(topics)), 1500);
-
   return (
     <div className={classes.root}>
       <NextSeo title="登录" />
@@ -245,15 +208,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
         </Paper>
       ) : (
         <Paper className={classes.paper} component="form" elevation={8}>
-          <Image className={classes.logo} src="/logo.png" alt="logo" unsized />
+          <Avatar className={classes.logo} src="/logo.png" alt="logo" />
           <Typography>星期四｜Thursday</Typography>
-          <div className={classes.topic}>
-            {transitions.map(({ item, key, props }) => (
-              <AnimatedTypography key={key} style={props}>
-                {item.name ? "#" + item.name : ""}
-              </AnimatedTypography>
-            ))}
-          </div>
           <TextField
             label="用户名"
             type="text"
@@ -335,32 +291,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ topics }) => {
       />
     </div>
   );
-};
-
-export const getStaticProps: GetStaticProps<LoginPageProps> = async () => {
-  const res = await fetch(`${process.env.API_URL}/v1/graphql`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-hasura-admin-secret": process.env.HASURA_GRAPHQL_ADMIN_SECRET!,
-    },
-    body: JSON.stringify({
-      query: `
-        query GetTopics {
-          topic(where: {category_id: {_neq: 2}}) {
-            name
-          }
-        }
-      `,
-    }),
-  });
-  const topicData = await res.json();
-
-  return {
-    props: {
-      topics: topicData?.data?.topic ?? [],
-    },
-  };
 };
 
 export default LoginPage;
